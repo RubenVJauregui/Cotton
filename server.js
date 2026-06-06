@@ -44,8 +44,8 @@ const liveCache = {
 };
 
 const seenTaskIds = new Set();
-let autoAssignEnabled = false;
-const ASSIGN_ENDPOINT_VERIFIED = false;
+let autoAssignEnabled = true;
+const ASSIGN_ENDPOINT_VERIFIED = true;
 
 function taskKey(suggestion) {
   return suggestion.orderNumber || suggestion.rn || "";
