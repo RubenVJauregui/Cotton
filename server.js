@@ -83,6 +83,7 @@ async function refreshLiveCache() {
     }
 
     liveCache.assignmentSuggestions = {
+      ...assignmentSuggestions,
       suggestions: allSuggestions,
       newSuggestions,
       newCount: newSuggestions.length,
@@ -632,6 +633,29 @@ function pickOffloaderName(task) {
   );
 }
 
+
+function pickAssigneeUserId(task) {
+  return String(
+    task.assigneeUserId ||
+    task.assigneeId ||
+    task.assignedUserId ||
+    task.userId ||
+    task.operatorId ||
+    task.receiverUserId ||
+    task.offloaderUserId ||
+    ""
+  ).trim();
+}
+
+function rememberAssigneeUser(userMap, name, userId) {
+  const key = normalizeName(name);
+  if (key && userId && !userMap.has(key)) userMap.set(key, String(userId));
+}
+
+function compactObject(value) {
+  return Object.fromEntries(Object.entries(value).filter(([, v]) => v !== undefined && v !== null && v !== ""));
+}
+
 function taskOrderCount(task) {
   if (Array.isArray(task.orderIds) && task.orderIds.length) return task.orderIds.length;
   if (Array.isArray(task.receiptIds) && task.receiptIds.length) return task.receiptIds.length;
@@ -812,6 +836,135 @@ function rankedWorkers(map, valueKey) {
   return [...map.values()].sort((a, b) => Number(b[valueKey] || 0) - Number(a[valueKey] || 0) || a.assignee.localeCompare(b.assignee));
 }
 
+function listFromPage(data) {
+  if (Array.isArray(data)) return data;
+  return data?.list || data?.records || data?.rows || data?.data || [];
+}
+
+async function fetchOrderPlanMap(headers, orderIds) {
+  const map = new Map();
+  const errors = [];
+  const chunks = [];
+  for (let i = 0; i < orderIds.length; i += 50) chunks.push(orderIds.slice(i, i + 50));
+  for (const ids of chunks) {
+    try {
+      const data = await apiFetch(`${WMS_API_BASE_URL}/wms-bam/outbound/order-plan/search-by-paging`, {
+        method: "POST",
+        headers,
+        body: JSON.stringify({ orderIds: ids, currentPage: 1, page: 1, pageSize: 50 }),
+      });
+      for (const row of listFromPage(data)) {
+        const rowOrderIds = row.orderIds || row.orders?.map((o) => o.orderId || o.orderNumber || o.id).filter(Boolean) || [];
+        for (const oid of rowOrderIds.length ? rowOrderIds : ids) {
+          if (ids.includes(String(oid))) map.set(String(oid), row);
+        }
+      }
+    } catch (error) {
+      errors.push(`/wms-bam/outbound/order-plan/search-by-paging: ${error.message || error}`);
+    }
+  }
+  return { map, errors };
+}
+
+async function fetchLoadTaskMap(headers, orderIds) {
+  const map = new Map();
+  const errors = [];
+  const chunks = [];
+  for (let i = 0; i < orderIds.length; i += 50) chunks.push(orderIds.slice(i, i + 50));
+  for (const ids of chunks) {
+    try {
+      const data = await apiFetch(`${WMS_API_BASE_URL}/wms-bam/outbound/load-task/search-by-paging`, {
+        method: "POST",
+        headers,
+        body: JSON.stringify({ orderIds: ids, statuses: ["NEW", "IN_PROGRESS"], currentPage: 1, page: 1, pageSize: 50 }),
+      });
+      for (const row of listFromPage(data)) {
+        const rowOrderIds = row.orderIds || row.orders?.map((o) => o.orderId || o.orderNumber || o.id).filter(Boolean) || [];
+        for (const oid of rowOrderIds.length ? rowOrderIds : ids) {
+          if (ids.includes(String(oid))) map.set(String(oid), row);
+        }
+      }
+    } catch (error) {
+      errors.push(`/wms-bam/outbound/load-task/search-by-paging: ${error.message || error}`);
+    }
+  }
+  return { map, errors };
+}
+
+async function fetchReceiveTaskMap(headers, receiptIds) {
+  const map = new Map();
+  const errors = [];
+  const chunks = [];
+  for (let i = 0; i < receiptIds.length; i += 50) chunks.push(receiptIds.slice(i, i + 50));
+  for (const ids of chunks) {
+    try {
+      const data = await apiFetch(`${WMS_API_BASE_URL}/wms-bam/inbound/receive-task/search-by-paging`, {
+        method: "POST",
+        headers,
+        body: JSON.stringify({ receiptIds: ids, statuses: ["NEW", "IN_PROGRESS"], currentPage: 1, page: 1, pageSize: 50 }),
+      });
+      for (const row of listFromPage(data)) {
+        const rowReceiptIds = row.receiptIds || row.receipts?.map((r) => r.receiptId || r.receiptNo || r.id).filter(Boolean) || [];
+        for (const rid of rowReceiptIds.length ? rowReceiptIds : ids) {
+          if (ids.includes(String(rid))) map.set(String(rid), row);
+        }
+      }
+    } catch (error) {
+      errors.push(`/wms-bam/inbound/receive-task/search-by-paging: ${error.message || error}`);
+    }
+  }
+  return { map, errors };
+}
+
+function buildOutboundAssignmentTarget(order, suggestion, userId, orderPlan, loadTask) {
+  const loadTaskId = loadTask?.id || loadTask?.taskId || "";
+  const orderPlanId = orderPlan?.id || orderPlan?.orderPlanId || "";
+  const loadIds = loadTask?.loadIds || loadTask?.loads?.map((l) => l.loadId || l.id).filter(Boolean) || (order.loadNo ? [order.loadNo] : []);
+  const orderIds = [order.orderNumber].filter(Boolean);
+  const targetType = loadTaskId ? "loadTask" : (orderPlanId ? "orderPlan" : "unresolvedOutboundTask");
+  return {
+    targetType,
+    orderIds,
+    loadIds,
+    customerId: order.customerId || orderPlan?.customerId || loadTask?.customerId || "",
+    orderPlanId,
+    pickTaskIds: orderPlan?.pickTaskIds || [],
+    loadTaskId,
+    suggestedAssigneeUserId: userId || "",
+    mutation: loadTaskId ? {
+      method: "POST",
+      endpoint: `/wms/outbound/load-task/${loadTaskId}`,
+      body: compactObject({ id: loadTaskId, assigneeUserId: userId }),
+    } : orderPlanId ? {
+      method: "PUT",
+      endpoint: "/wms/outbound/order-plan/update",
+      body: compactObject({ id: orderPlanId, defaultAssigneeUserId: userId }),
+    } : null,
+    mutationReady: Boolean(userId && (loadTaskId || orderPlanId)),
+  };
+}
+
+function buildInboundAssignmentTarget(rn, suggestion, userId, receiveTask) {
+  const receiveTaskId = receiveTask?.id || receiveTask?.taskId || "";
+  const receiptIds = receiveTask?.receiptIds || (rn.rn ? [rn.rn] : []);
+  return {
+    targetType: receiveTaskId ? "receiveTask" : "unresolvedReceiveTask",
+    receiptId: receiptIds[0] || rn.rn || "",
+    receiveTaskId,
+    customerId: rn.customerId || receiveTask?.customerId || "",
+    entryId: receiveTask?.entryId || "",
+    dockId: receiveTask?.dockId || "",
+    taskStepIds: (receiveTask?.taskSteps || []).map((step) => step.id).filter(Boolean),
+    suggestedAssigneeUserId: userId || "",
+    mutation: receiveTaskId ? {
+      method: "PUT",
+      endpoint: "/wms/inbound/receive-task",
+      body: compactObject({ id: receiveTaskId, receiptIds, customerId: receiveTask?.customerId, assigneeUserId: userId, applyAssigneeToAllTaskSteps: true }),
+    } : null,
+    mutationReady: Boolean(userId && receiveTaskId),
+  };
+}
+
 async function fetchAssignmentSuggestions(session = lastSession) {
   if (!session?.accessToken || !session?.cottonFacility?.id) {
     throw new Error("Sign in and load Cotton first.");
@@ -831,10 +984,12 @@ async function fetchAssignmentSuggestions(session = lastSession) {
   const overall = new Map();
   const offloadByCustomer = new Map();
   const offloadOverall = new Map();
+  const assigneeUserIds = new Map();
 
   for (const task of tasks) {
     if (!isPackedTask(task)) continue;
     const assignee = String(pickAssigneeName(task) || "").trim();
+    rememberAssigneeUser(assigneeUserIds, assignee, pickAssigneeUserId(task));
     const customer = pickTaskCustomer(task);
     if (!assignee || !customer) continue;
     const packedOrders = taskOrderCount(task);
@@ -852,6 +1007,7 @@ async function fetchAssignmentSuggestions(session = lastSession) {
   for (const task of offloadResult.tasks) {
     if (!isOffloadedTask(task)) continue;
     const assignee = String(pickOffloaderName(task) || "").trim();
+    rememberAssigneeUser(assigneeUserIds, assignee, pickAssigneeUserId(task));
     const customer = pickTaskCustomer(task);
     if (!assignee || !customer) continue;
     const offloadedRns = taskOrderCount(task);
@@ -912,7 +1068,28 @@ async function fetchAssignmentSuggestions(session = lastSession) {
       source: rank.length ? "Customer 6-month offload history" : (offloadOverallRank.length ? "Overall Cotton 6-month offload history" : "No offload history found"),
     };
   });
-  const suggestions = [...outboundSuggestions, ...inboundSuggestions];
+  const orderIds = plannedRows.map((order) => order.orderNumber).filter(Boolean);
+  const receiptIds = inboundRows.map((rn) => rn.rn).filter(Boolean);
+  const [orderPlanLookup, loadTaskLookup, receiveTaskLookup] = await Promise.all([
+    fetchOrderPlanMap(headers, orderIds),
+    fetchLoadTaskMap(headers, orderIds),
+    fetchReceiveTaskMap(headers, receiptIds),
+  ]);
+
+  const enrichedOutboundSuggestions = outboundSuggestions.map((suggestion, index) => {
+    const order = plannedRows[index] || {};
+    const userId = assigneeUserIds.get(normalizeName(suggestion.suggestedAssignee)) || "";
+    const assignmentTarget = buildOutboundAssignmentTarget(order, suggestion, userId, orderPlanLookup.map.get(order.orderNumber), loadTaskLookup.map.get(order.orderNumber));
+    return { ...suggestion, suggestedAssigneeUserId: userId, assignmentTarget };
+  });
+  const enrichedInboundSuggestions = inboundSuggestions.map((suggestion, index) => {
+    const rn = inboundRows[index] || {};
+    const userId = assigneeUserIds.get(normalizeName(suggestion.suggestedAssignee)) || "";
+    const assignmentTarget = buildInboundAssignmentTarget(rn, suggestion, userId, receiveTaskLookup.map.get(rn.rn));
+    return { ...suggestion, suggestedAssigneeUserId: userId, assignmentTarget };
+  });
+  const suggestions = [...enrichedOutboundSuggestions, ...enrichedInboundSuggestions];
+  const assignmentReadyCount = suggestions.filter((s) => s.assignmentTarget?.mutationReady).length;
 
   const result = {
     facility: session.cottonFacility,
@@ -922,12 +1099,83 @@ async function fetchAssignmentSuggestions(session = lastSession) {
     packedTaskRows: tasks.filter(isPackedTask).length,
     offloadTaskRows: offloadResult.tasks.filter(isOffloadedTask).length,
     offloadTaskErrors: offloadResult.errors,
+    idLookupErrors: [...orderPlanLookup.errors, ...loadTaskLookup.errors, ...receiveTaskLookup.errors],
+    assignmentEndpointWiring: {
+      receiveTask: { method: "PUT", endpoint: "/wms/inbound/receive-task" },
+      orderPlan: { method: "PUT", endpoint: "/wms/outbound/order-plan/update" },
+      loadTask: { method: "POST", endpointTemplate: "/wms/outbound/load-task/{id}" },
+      loadTaskBatch: { method: "PUT", endpoint: "/wms/outbound/load-task/batch-update" },
+    },
+    assignmentReadyCount,
     suggestions,
   };
   try {
     fs.writeFileSync(path.join(__dirname, "last-assignment-suggestions.json"), JSON.stringify(result, null, 2));
   } catch {}
   return result;
+}
+
+async function executeLiveAutoAssign() {
+  if (!SERVICE_USERNAME || !SERVICE_PASSWORD) {
+    throw new Error("Service credentials not configured. Cannot perform assignments.");
+  }
+  const suggestions = liveCache.assignmentSuggestions?.suggestions || [];
+  if (!suggestions.length) {
+    return { assigned: [], skipped: [], errors: [], message: "No suggestions available to assign." };
+  }
+
+  const session = await login(SERVICE_USERNAME, SERVICE_PASSWORD);
+  const headers = wmsHeaders(session, session.cottonFacility);
+  const assigned = [];
+  const skipped = [];
+  const errors = [];
+
+  for (const sug of suggestions) {
+    const id = sug.orderNumber || sug.rn || "unknown";
+    const target = sug.assignmentTarget;
+
+    if (!target) {
+      skipped.push({ id, assignee: sug.suggestedAssignee, reason: "No assignment target resolved." });
+      continue;
+    }
+    if (!target.mutationReady) {
+      const missing = [];
+      if (!target.suggestedAssigneeUserId) missing.push("assignee user ID");
+      if (target.targetType === "unresolvedOutboundTask") missing.push("order-plan or load-task ID");
+      if (target.targetType === "unresolvedReceiveTask") missing.push("receive-task ID");
+      skipped.push({ id, assignee: sug.suggestedAssignee, reason: `Not fully resolved: missing ${missing.join(", ") || "target IDs"}.` });
+      continue;
+    }
+    if (!target.mutation) {
+      skipped.push({ id, assignee: sug.suggestedAssignee, reason: "Mutation spec not available." });
+      continue;
+    }
+
+    try {
+      const mutUrl = `${WMS_API_BASE_URL}${target.mutation.endpoint}`;
+      await apiFetch(mutUrl, {
+        method: target.mutation.method,
+        headers,
+        body: JSON.stringify(target.mutation.body),
+      });
+      assigned.push({
+        id,
+        assignee: sug.suggestedAssignee,
+        assigneeUserId: target.suggestedAssigneeUserId,
+        type: target.targetType,
+        endpoint: target.mutation.endpoint,
+      });
+    } catch (err) {
+      errors.push({ id, assignee: sug.suggestedAssignee, type: target.targetType, error: err.message || "Mutation failed." });
+    }
+  }
+
+  return {
+    assigned,
+    skipped,
+    errors,
+    message: `Assigned ${assigned.length}, skipped ${skipped.length}, errors ${errors.length}.`,
+  };
 }
 
 async function handler(req, res) {
@@ -1035,6 +1283,9 @@ async function handler(req, res) {
     if (req.method === "POST" && pathname === "/api/assignment-suggestions") {
       const session = await readJson(req);
       return send(res, 200, await fetchAssignmentSuggestions(session));
+    }
+    if (req.method === "POST" && pathname === "/api/live-auto-assign") {
+      return send(res, 200, await executeLiveAutoAssign());
     }
     return send(res, 404, { message: "Not found." });
   } catch (error) {
