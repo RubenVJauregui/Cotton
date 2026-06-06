@@ -1,0 +1,1228 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Cotton Dashboard</title>
+  <style>
+    :root {
+      color-scheme: light;
+      --bg: #061324;
+      --ink: #eaf2ff;
+      --muted: #a8b8d4;
+      --line: rgba(133, 160, 202, .68);
+      --panel: rgba(5, 18, 35, .76);
+      --accent: #1765ff;
+      --accent-dark: #0b4fe0;
+      --warn: #9a3412;
+      --blue: #1765ff;
+    }
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      min-height: 100vh;
+      font-family: Inter, Arial, Helvetica, sans-serif;
+      background:
+        linear-gradient(180deg, rgba(3, 10, 22, .08), rgba(3, 10, 22, .26) 58%, rgba(3, 10, 22, .74)),
+        url("assets/storm-dashboard-bg.png") center top / cover fixed no-repeat,
+        #061324;
+      background-attachment: fixed;
+      color: var(--ink);
+      overflow-x: hidden;
+    }
+    body::before {
+      content: "";
+      position: fixed;
+      inset: 0;
+      pointer-events: none;
+      background: radial-gradient(ellipse at center, transparent 48%, rgba(0,0,0,.16) 100%);
+      filter: none;
+    }
+    body::after {
+      content: none;
+    }
+    header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 20px;
+      position: relative;
+      z-index: 1;
+      padding: 28px 24px 22px;
+      background: transparent;
+      color: #fff;
+      border-bottom: 0;
+    }
+    h1, h2, h3, p { margin: 0; }
+    h1 { font-size: 30px; font-weight: 900; letter-spacing: -.03em; }
+    header p { margin-top: 7px; color: #d8e6ff; font-size: 14px; font-weight: 700; }
+    header > div:first-child { position: relative; padding-left: 62px; }
+    header > div:first-child::before {
+      content: "🌵";
+      position: absolute;
+      left: 0;
+      top: -4px;
+      width: 48px;
+      height: 58px;
+      display: grid;
+      place-items: center;
+      font-size: 46px;
+      line-height: 1;
+    }
+    main {
+      position: relative;
+      z-index: 1;
+      padding: 18px 24px 34px;
+      max-width: 1634px;
+      margin: 0 auto;
+    }
+    .login {
+      max-width: 420px;
+      margin: 70px auto;
+      background: var(--panel);
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      padding: 22px;
+      box-shadow: 0 20px 55px rgba(16, 24, 40, .12);
+    }
+    header > div:first-child::before {
+      content: "";
+      left: 10px;
+      top: -1px;
+      width: 28px;
+      height: 56px;
+      border-radius: 14px 14px 7px 7px;
+      background: linear-gradient(#4ee657, #2fa334);
+      box-shadow:
+        -17px 17px 0 -4px #39bd3e,
+        17px 23px 0 -4px #39bd3e,
+        0 0 18px rgba(72,221,78,.35);
+      font-size: 0;
+      line-height: 0;
+    }
+    header > div:first-child::after {
+      content: "";
+      position: absolute;
+      left: 3px;
+      top: 15px;
+      width: 9px;
+      height: 23px;
+      border-radius: 10px 0 0 10px;
+      border-left: 8px solid #39bd3e;
+      border-bottom: 8px solid #39bd3e;
+    }
+    .login {
+      background: rgba(255,255,255,.96);
+      border-color: #dce5f1;
+      color: #07173a;
+    }
+    header > div:first-child::before {
+      content: "" !important;
+      left: -2px !important;
+      top: -9px !important;
+      width: 58px !important;
+      height: 72px !important;
+      border: 0 !important;
+      border-radius: 0 !important;
+      background: url("assets/cactus-original.png") center / contain no-repeat !important;
+      box-shadow: none !important;
+      filter: drop-shadow(0 7px 12px rgba(0,0,0,.42)) drop-shadow(0 0 10px rgba(13, 38, 31, .28)) !important;
+      font-size: 0 !important;
+      line-height: 0 !important;
+    }
+    header > div:first-child::after {
+      display: none !important;
+    }
+    label { display: grid; gap: 7px; margin: 12px 0; font-size: 13px; color: var(--muted); font-weight: 700; }
+    input {
+      width: 100%;
+      border: 1px solid #c8d2df;
+      border-radius: 8px;
+      padding: 11px 12px;
+      font: inherit;
+      color: var(--ink);
+      background: rgba(255,255,255,.96);
+    }
+    button {
+      border: 0;
+      background: var(--accent);
+      color: #fff;
+      padding: 10px 13px;
+      font-weight: 800;
+      border-radius: 8px;
+      cursor: pointer;
+    }
+    button:hover { background: var(--accent-dark); }
+    button:disabled { opacity: .55; cursor: wait; }
+    .toolbar { display: flex; gap: 10px; align-items: center; flex-wrap: wrap; }
+    .toolbar button {
+      min-width: 132px;
+      min-height: 46px;
+    }
+    .ghost {
+      background: rgba(9, 22, 42, .45);
+      border: 1px solid rgba(220, 231, 255, .7);
+      box-shadow: 0 12px 30px rgba(0,0,0,.18);
+    }
+    .ghost:hover { background: rgba(23, 49, 86, .85); }
+    .message {
+      color: var(--warn);
+      font-weight: 700;
+      font-size: 13px;
+      min-height: 18px;
+      margin-top: 10px;
+    }
+    .stats {
+      display: grid;
+      grid-template-columns: repeat(6, minmax(0, 1fr));
+      gap: 14px;
+      margin: 22px 0 18px;
+    }
+    .auto-actions {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 18px;
+      margin: 0 0 18px;
+      padding: 8px 0;
+    }
+    header .auto-actions {
+      flex: 1;
+      justify-content: center;
+      align-items: center;
+      margin: 0;
+      padding: 0;
+      transform: translateY(16px);
+    }
+    .auto-action-button {
+      border: 1px solid #4d69ff;
+      border-radius: 8px;
+      background: linear-gradient(180deg, rgba(42, 63, 169, .88), rgba(31, 48, 132, .86));
+      color: #fff;
+      padding: 14px 24px;
+      min-width: 164px;
+      font-size: 13px;
+      font-weight: 900;
+      line-height: 1;
+      box-shadow: inset 0 0 0 1px rgba(255,255,255,.12), 0 10px 26px rgba(0, 0, 0, .25);
+    }
+    .auto-action-button:hover {
+      background: linear-gradient(180deg, rgba(54, 79, 198, .96), rgba(38, 58, 153, .94));
+      border-color: #6d86ff;
+      box-shadow: inset 0 0 0 1px rgba(255,255,255,.16), 0 12px 32px rgba(0, 0, 0, .32);
+    }
+    .dashboard-message {
+      min-height: 18px;
+      margin: -6px 0 12px;
+      color: var(--warn);
+      font-size: 13px;
+      font-weight: 800;
+    }
+    .card, section {
+      background: var(--panel);
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      box-shadow: 0 18px 46px rgba(0, 0, 0, .32), inset 0 0 0 1px rgba(255,255,255,.035);
+      backdrop-filter: blur(8px);
+    }
+    .card {
+      min-height: 126px;
+      padding: 25px 18px 18px 104px;
+      position: relative;
+      background: rgba(5, 18, 35, .38);
+    }
+    .card span { color: #f1f6ff; font-size: 11px; font-weight: 900; text-transform: uppercase; }
+    .card strong { display: block; font-size: 28px; margin-top: 8px; line-height: 1.05; color: #fff; }
+    .card small { color: #d3def2; font-size: 12px; font-weight: 800; }
+    .metric-icon {
+      position: absolute;
+      left: 15px;
+      top: 27px;
+      width: 82px;
+      height: 72px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background: transparent;
+      color: #7fa2ff;
+      border: 0;
+    }
+    .metric-icon svg {
+      width: 38px;
+      height: 38px;
+      stroke: currentColor;
+      fill: none;
+      stroke-width: 2.1;
+      stroke-linecap: round;
+      stroke-linejoin: round;
+      filter: drop-shadow(0 4px 6px rgba(0,0,0,.28));
+    }
+    .metric-icon img {
+      width: 82px;
+      height: 64px;
+      object-fit: contain;
+      filter: drop-shadow(0 7px 9px rgba(0,0,0,.44));
+    }
+    .metric-customers .metric-icon,
+    .metric-planned-ftl-ltl-orders .metric-icon,
+    .metric-older-than-48-hours .metric-icon,
+    .metric-e-comm-orders .metric-icon,
+    .metric-e-comm-past-sla .metric-icon { background: transparent; border: 0; }
+    button.card {
+      width: 100%;
+      text-align: left;
+      cursor: pointer;
+      color: inherit;
+    }
+    button.card:hover,
+    button.card.active {
+      border-color: var(--accent);
+      background: rgba(17, 44, 82, .82);
+    }
+    .metric-menu-wrap {
+      position: relative;
+      min-width: 0;
+      height: 100%;
+    }
+    .metric-menu-wrap > .card {
+      height: 100%;
+      min-height: 126px;
+      background: rgba(5, 18, 35, .38);
+    }
+    .customer-dropdown {
+      position: absolute;
+      top: calc(100% + 4px);
+      left: 0;
+      right: 0;
+      z-index: 20;
+      max-height: 280px;
+      overflow-y: auto;
+      border: 1px solid rgba(135, 163, 207, .72);
+      background: rgba(7, 22, 40, .96);
+      border-radius: 8px;
+      box-shadow: 0 16px 40px rgba(16, 24, 40, .18);
+      padding: 5px;
+    }
+    .customer-dropdown button {
+      display: block;
+      width: 100%;
+      border: 0;
+      background: transparent;
+      color: #eaf2ff;
+      padding: 8px 9px;
+      text-align: left;
+      font-size: 12px;
+      font-weight: 800;
+    }
+    .customer-dropdown button:hover,
+    .customer-dropdown button.active {
+      background: rgba(37, 99, 235, .24);
+      color: #fff;
+    }
+    .grid {
+      display: grid;
+      grid-template-columns: minmax(0, 1.94fr) minmax(520px, 1fr);
+      gap: 16px;
+      align-items: start;
+    }
+    .equipment-section { width: calc((100% - 16px) * .657); margin-bottom: 16px; }
+    section { overflow: hidden; }
+    .section-head {
+      display: flex;
+      justify-content: space-between;
+      gap: 10px;
+      align-items: center;
+      padding: 18px 18px;
+      border-bottom: 1px solid rgba(135, 163, 207, .42);
+      background: rgba(8, 24, 43, .72);
+    }
+    .section-head h2 { font-size: 18px; color: #f4f8ff; }
+    .section-head span {
+      color: #dce8ff;
+      font-size: 12px;
+      font-weight: 900;
+      background: rgba(71, 96, 138, .36);
+      border-radius: 999px;
+      padding: 7px 12px;
+    }
+    .row-limit-controls {
+      display: flex;
+      gap: 8px;
+      align-items: center;
+      flex-wrap: wrap;
+    }
+    .row-limit-button {
+      color: #dce8ff;
+      font-size: 12px;
+      font-weight: 900;
+      background: rgba(71, 96, 138, .36);
+      border: 1px solid rgba(135, 163, 207, .2);
+      border-radius: 999px;
+      padding: 7px 12px;
+      line-height: 1;
+    }
+    .row-limit-button:hover,
+    .row-limit-button.active {
+      background: rgba(37, 99, 235, .5);
+      border-color: rgba(125, 163, 255, .64);
+    }
+    #dashboard > section,
+    #dashboard > .grid { margin-top: 0; }
+    .section-title-line {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      flex-wrap: wrap;
+      min-width: 0;
+    }
+    .table-wrap { overflow: auto; max-height: 620px; }
+    .orders-table-wrap { max-height: 366px; overflow-y: auto; overflow-x: auto; }
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 11px;
+      white-space: nowrap;
+    }
+    th, td {
+      border-bottom: 1px solid rgba(135, 163, 207, .2);
+      padding: 8px 10px;
+      text-align: left;
+      vertical-align: top;
+    }
+    th {
+      position: sticky;
+      top: 0;
+      background: rgba(14, 36, 61, .94);
+      z-index: 1;
+      color: #dce8ff;
+      font-size: 11px;
+      text-transform: uppercase;
+    }
+    th button.sort-header {
+      width: 100%;
+      border: 0;
+      background: transparent;
+      color: inherit;
+      padding: 0;
+      font: inherit;
+      font-weight: 800;
+      text-align: inherit;
+      text-transform: uppercase;
+      cursor: pointer;
+    }
+    th button.sort-header:hover { color: var(--accent-dark); }
+    th button.sort-header.active::after {
+      content: attr(data-direction);
+      display: inline-block;
+      margin-left: 6px;
+      color: var(--accent);
+      font-size: 10px;
+    }
+    td.number, th.number { text-align: right; }
+    td { color: #edf4ff; }
+    .strong { font-weight: 900; color: #fff; }
+    .status {
+      display: inline-block;
+      padding: 2px 7px;
+      background: rgba(37, 99, 235, .38);
+      color: #72a0ff;
+      border: 1px solid rgba(70, 117, 235, .42);
+      font-weight: 800;
+      font-size: 11px;
+      border-radius: 4px;
+    }
+    .diagnostics { margin-top: 14px; }
+    .diagnostics .table-wrap { max-height: 210px; }
+    .assignee-grid {
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: 10px;
+      padding: 12px;
+    }
+    .assignee-card {
+      border: 1px solid #d8e0ea;
+      background: rgba(8, 24, 43, .72);
+      border-color: rgba(135, 163, 207, .42);
+      border-radius: 8px;
+      padding: 12px;
+      min-height: 94px;
+      display: grid;
+      grid-template-columns: 44px 1fr;
+      gap: 12px;
+      align-items: center;
+    }
+    .assignee-avatar {
+      width: 42px;
+      height: 42px;
+      border-radius: 50%;
+      display: grid;
+      place-items: center;
+      color: #fff;
+      background: #1765ff;
+      font-weight: 900;
+      font-size: 14px;
+    }
+    .assignee-card span {
+      display: block;
+      color: #f1f6ff;
+      font-size: 11px;
+      font-weight: 800;
+      text-transform: uppercase;
+      white-space: normal;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+    .assignee-card strong {
+      display: block;
+      margin-top: 8px;
+      font-size: 18px;
+      line-height: 1;
+      color: #fff;
+    }
+    .assignment-panel { margin-bottom: 14px; }
+    .assignment-panel.hidden { display: none; }
+    .assignment-note {
+      padding: 10px 14px;
+      color: #c6d5ee;
+      font-size: 12px;
+      font-weight: 700;
+      border-bottom: 1px solid var(--line);
+      background: rgba(8, 24, 43, .88);
+    }
+    .assignment-actions {
+      display: flex;
+      gap: 10px;
+      flex-wrap: wrap;
+      padding: 10px 14px;
+      border-bottom: 1px solid var(--line);
+      background: rgba(8, 24, 43, .88);
+    }
+    tbody tr:hover td { background: rgba(23, 58, 98, .28); }
+    .table-wrap::-webkit-scrollbar,
+    .customer-dropdown::-webkit-scrollbar { width: 10px; height: 10px; }
+    .table-wrap::-webkit-scrollbar-thumb,
+    .customer-dropdown::-webkit-scrollbar-thumb { background: rgba(141, 165, 205, .45); border-radius: 999px; }
+    .table-wrap::-webkit-scrollbar-track,
+    .customer-dropdown::-webkit-scrollbar-track { background: rgba(7, 22, 40, .35); }
+    .assign-button {
+      background: #16a34a;
+      color: #fff;
+      border: 1px solid #15803d;
+      min-width: 110px;
+    }
+    .assign-button:hover { background: #15803d; }
+    .confirm-assign-button {
+      background: #0f766e;
+      color: #fff;
+      border: 1px solid #115e59;
+    }
+    .confirm-assign-button:hover { background: #115e59; }
+    .live-info-bar {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px 20px;
+      padding: 10px 14px;
+      margin-bottom: 14px;
+      background: rgba(23, 101, 255, .08);
+      border: 1px solid rgba(23, 101, 255, .28);
+      border-radius: 8px;
+      font-size: 12px;
+      font-weight: 700;
+      color: #a8c4ff;
+    }
+    .live-info-bar span::before {
+      content: "•";
+      margin-right: 6px;
+      color: #5f8cff;
+    }
+    .hidden { display: none !important; }
+    @media (max-width: 1450px) {
+      .stats { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+      .equipment-section { max-width: none; }
+      .grid { grid-template-columns: 1fr; }
+    }
+    @media (max-width: 1050px) {
+      header { align-items: flex-start; flex-direction: column; }
+      header > div:first-child { padding-left: 0; }
+      header > div:first-child::before { display: none; }
+      header .auto-actions { justify-content: flex-start; transform: none; }
+      .grid { grid-template-columns: 1fr; }
+      .toolbar { width: 100%; }
+      .stats { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+      .assignee-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+    }
+    @media (max-width: 640px) {
+      main { padding: 14px; }
+      header { padding: 20px 14px; }
+      .stats { grid-template-columns: 1fr; }
+      .assignee-grid { grid-template-columns: 1fr; }
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <div>
+      <h1>Cotton Dashboard</h1>
+      <p id="subtitle">WISE data locked to the Cotton facility</p>
+    </div>
+    <div class="auto-actions" aria-label="Auto assign actions">
+      <button id="autoSuggestButton" class="auto-action-button" type="button">Auto Suggest</button>
+      <button id="autoAssignButton" class="auto-action-button" type="button">Auto Assign</button>
+      <button id="autonomousButton" class="auto-action-button" type="button">Autonomous</button>
+    </div>
+    <div class="toolbar">
+      <button id="refreshButton" class="ghost hidden" type="button">Refresh</button>
+      <button id="csvButton" class="ghost hidden" type="button">Download CSV</button>
+    </div>
+  </header>
+
+  <main>
+    <form id="loginForm" class="login">
+      <h2>Sign in to WISE</h2>
+      <p style="margin-top:6px;color:var(--muted);font-size:13px;">Your password stays on this computer and is only sent to the WISE login endpoint.</p>
+      <label>Username <input id="username" autocomplete="username" required /></label>
+      <label>Password <input id="password" type="password" autocomplete="current-password" required /></label>
+      <button id="loginButton" type="submit">Load Cotton</button>
+      <div id="message" class="message"></div>
+    </form>
+
+    <div id="dashboard" class="hidden">
+      <div id="dashboardMessage" class="dashboard-message"></div>
+      <div id="liveInfoBar" class="live-info-bar hidden">
+        <span>Fresh WISE data every 10 minutes.</span>
+        <span>Auto Suggest holds all RNs and planned orders until Auto Assign is clicked.</span>
+        <span>Auto Assign assigns new tasks only after confirmation.</span>
+      </div>
+      <section id="assignmentPanel" class="assignment-panel hidden">
+        <div class="section-head">
+          <h2>Auto Suggest</h2>
+          <span id="assignmentCount">0 tasks</span>
+        </div>
+        <div id="assignmentNote" class="assignment-note"></div>
+        <div id="assignmentActions" class="assignment-actions hidden">
+          <button id="assignButton" class="assign-button" type="button">Auto Assign</button>
+          <button id="confirmAssignButton" class="confirm-assign-button hidden" type="button">Confirm: assign these tasks in WISE</button>
+          <button id="confirmAutonomousButton" class="confirm-assign-button hidden" type="button">Confirm: autonomous assignment in WISE</button>
+        </div>
+        <div class="table-wrap" style="max-height:360px;">
+          <table>
+            <thead>
+              <tr><th>Work Type</th><th>Order / RN</th><th>Customer</th><th>Status</th><th>Order Type</th><th>Suggested Assignee</th><th>History Count</th><th>Rule</th></tr>
+            </thead>
+            <tbody id="assignmentRows"></tbody>
+          </table>
+        </div>
+      </section>
+      <div id="stats" class="stats"></div>
+      <section class="equipment-section">
+        <div class="section-head">
+          <h2>Section 1 - In-Yard FULL Equipment</h2>
+          <span id="equipmentCount">0 rows</span>
+        </div>
+        <div class="table-wrap" style="max-height:360px;">
+          <table>
+            <thead>
+              <tr><th>Equipment #</th><th>Entry Ticket</th><th>Check-in</th><th>Time in Yard</th><th>Customer</th><th>Location</th></tr>
+            </thead>
+            <tbody id="equipmentRows"></tbody>
+          </table>
+        </div>
+      </section>
+      <div class="grid">
+        <section>
+          <div class="section-head">
+            <div class="section-title-line">
+              <h2>Section 2 - PLANNED Outbound Orders</h2>
+            </div>
+            <div class="row-limit-controls" aria-label="Planned order row view">
+              <button class="row-limit-button active" type="button" data-row-limit="10">10 rows</button>
+              <button class="row-limit-button" type="button" data-row-limit="25">25 rows</button>
+              <button class="row-limit-button" type="button" data-row-limit="50">50 rows</button>
+            </div>
+          </div>
+          <div id="ordersTableWrap" class="table-wrap orders-table-wrap">
+            <table>
+              <thead>
+                <tr>
+                  <th><button class="sort-header" type="button" data-sort="orderNumber">Order #</button></th>
+                  <th><button class="sort-header" type="button" data-sort="customer">Customer</button></th>
+                  <th><button class="sort-header" type="button" data-sort="status">Status</button></th>
+                  <th class="number"><button class="sort-header" type="button" data-sort="baseQty">BASE QTY</button></th>
+                  <th><button class="sort-header" type="button" data-sort="po">PO #</button></th>
+                  <th><button class="sort-header" type="button" data-sort="so">SO #</button></th>
+                  <th><button class="sort-header" type="button" data-sort="appointmentTime">Appointment Time</button></th>
+                  <th><button class="sort-header" type="button" data-sort="retailerName">Retailer</button></th>
+                  <th><button class="sort-header" type="button" data-sort="carrier">Carrier</button></th>
+                </tr>
+              </thead>
+              <tbody id="detailRows"></tbody>
+            </table>
+          </div>
+        </section>
+        <section>
+          <div class="section-head">
+            <h2>Cotton Assignees</h2>
+            <span id="assigneeCount">Loading</span>
+          </div>
+          <div id="assigneeGrid" class="assignee-grid"></div>
+        </section>
+      </div>
+
+      <section style="margin-top:14px;">
+        <div class="section-head">
+          <h2>Watch List</h2>
+          <span>Blocked, failed, picking, or partial shipped</span>
+        </div>
+        <div class="table-wrap" style="max-height:320px;">
+          <table>
+            <thead><tr><th>Order #</th><th>Customer</th><th>Status</th><th>Created</th><th>Carrier</th></tr></thead>
+            <tbody id="watchRows"></tbody>
+          </table>
+        </div>
+      </section>
+
+    </div>
+  </main>
+
+  <script>
+    let session = null;
+    let latest = null;
+    let detailSort = { key: "orderNumber", direction: "asc" };
+    let selectedCustomer = "ALL";
+    let tableFilter = "ALL";
+    let customerMenuOpen = false;
+    let assignmentSuggestions = null;
+    let assignmentMode = "assign";
+    let plannedRowLimit = 10;
+    let liveRefreshTimer = null;
+    let liveUpdatedAt = null;
+    let liveNextRefreshAt = null;
+    let liveCache_suggestions = null;
+    const previewMode = new URLSearchParams(window.location.search).has("preview");
+    const $ = (id) => document.getElementById(id);
+    const fmt = (value) => Number(value || 0).toLocaleString("en-US");
+    const esc = (value) => String(value ?? "").replace(/[&<>"]/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" }[c]));
+    const slug = (value) => String(value || "").toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/^-+|-+$/g, "");
+    const metricIcon = (label) => ({
+      "In-Yard FULL Equipment": `<img src="assets/metric-truck.png?v=3d3" alt="" />`,
+      "Customers": `<img src="assets/metric-customers.png?v=3d3" alt="" />`,
+      "Planned FTL/LTL Orders": `<img src="assets/metric-clipboard.png?v=3d3" alt="" />`,
+      "Older than 48 hours": `<img src="assets/metric-clock.png?v=3d3" alt="" />`,
+      "E-Comm Orders": `<img src="assets/metric-cart.png?v=3d3" alt="" />`,
+      "E-Comm Past SLA": `<img src="assets/metric-warning.png?v=3d3" alt="" />`,
+    }[label] || `<svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="8"/></svg>`);
+    const initials = (value) => String(value || "?").split(/\s+/).filter(Boolean).slice(0, 2).map((part) => part[0]).join("").toUpperCase() || "?";
+    const avatarColor = (value) => {
+      const colors = ["#1765ff", "#10a76a", "#f59e0b", "#7c3aed", "#06b6d4", "#ec407a", "#5cb338"];
+      const total = [...String(value || "")].reduce((sum, char) => sum + char.charCodeAt(0), 0);
+      return colors[total % colors.length];
+    };
+    const date = (value, withTime = true) => {
+      if (!value) return "Pending";
+      const d = new Date(value);
+      if (Number.isNaN(d.getTime())) return value;
+      return new Intl.DateTimeFormat("en-US", {
+        timeZone: "America/Los_Angeles",
+        year: "numeric",
+        month: "2-digit",
+        day: "2-digit",
+        ...(withTime ? { hour: "2-digit", minute: "2-digit", hour12: false } : {}),
+      }).format(d);
+    };
+
+    async function post(url, body) {
+      const res = await fetch(url, {
+        method: "POST",
+        headers: { "content-type": "application/json" },
+        body: JSON.stringify(body),
+      });
+      const json = await res.json().catch(() => ({}));
+      if (!res.ok) throw new Error(json.message || "Request failed.");
+      return json;
+    }
+
+    function setBusy(busy, text) {
+      $("loginButton").disabled = busy;
+      $("refreshButton").disabled = busy;
+      $("autoSuggestButton").disabled = busy;
+      $("autoAssignButton").disabled = busy;
+      $("autonomousButton").disabled = busy;
+      $("message").textContent = text || "";
+      $("dashboardMessage").textContent = text || "";
+    }
+
+    function detailSortValue(row, key) {
+      if (key === "baseQty") return Number(row.baseQty || 0);
+      if (key === "appointmentTime") {
+        const time = new Date(row.appointmentTime || 0).getTime();
+        return Number.isNaN(time) ? 0 : time;
+      }
+      if (key === "po") return String(row.po || row.reference || "").toLowerCase();
+      return String(row[key] || "").toLowerCase();
+    }
+
+    function sortedDetailRows() {
+      const sourceRows = tableFilter === "DS24" ? (latest?.dropshipOlderThan24Rows || []) : (latest?.detailRows || []);
+      const rows = sourceRows.filter((row) => {
+        const customerMatch = selectedCustomer === "ALL" || row.customer === selectedCustomer;
+        const type = String(row.orderType || "").toUpperCase().replace(/[^A-Z0-9]+/g, " ").trim();
+        const ecommMatch = tableFilter !== "ECOMM" || type === "DS" || type === "DROPSHIP" || type === "DROP SHIP";
+        const created = new Date(row.created || 0).getTime();
+        const ageHours = Number.isNaN(created) ? 0 : Math.floor((Date.now() - created) / 36e5);
+        const older48Match = tableFilter !== "OLDER48" || (!(type === "DS" || type === "DROPSHIP" || type === "DROP SHIP") && ageHours >= 48);
+        return customerMatch && ecommMatch && older48Match;
+      });
+      const multiplier = detailSort.direction === "asc" ? 1 : -1;
+      return rows.sort((a, b) => {
+        const av = detailSortValue(a, detailSort.key);
+        const bv = detailSortValue(b, detailSort.key);
+        if (typeof av === "number" && typeof bv === "number") return (av - bv) * multiplier;
+        return String(av).localeCompare(String(bv), undefined, { numeric: true, sensitivity: "base" }) * multiplier;
+      });
+    }
+
+    function customerCounts() {
+      const rows = latest?.customerRows || [];
+      if (rows.length) return rows.map((row) => [row.customer || "Unknown", Number(row.orderCount || 0)]);
+      const counts = new Map();
+      for (const row of latest?.detailRows || []) {
+        const name = row.customer || "Unknown";
+        counts.set(name, (counts.get(name) || 0) + 1);
+      }
+      return [...counts.entries()].sort((a, b) => b[1] - a[1] || a[0].localeCompare(b[0]));
+    }
+
+    function customerOptions() {
+      const counts = customerCounts();
+      if (selectedCustomer !== "ALL" && !counts.some(([name]) => name === selectedCustomer)) {
+        selectedCustomer = "ALL";
+      }
+      return [["ALL", `ALL (${fmt(counts.length)})`], ...counts.map(([name, count]) => [name, `${name} (${fmt(count)})`])];
+    }
+
+    function filteredRows(rows) {
+      return (rows || []).filter((row) => selectedCustomer === "ALL" || row.customer === selectedCustomer);
+    }
+
+    function buildPivotRows(rows) {
+      const counts = new Map();
+      for (const row of rows || []) {
+        const name = row.customer || "Unknown";
+        const current = counts.get(name) || { customer: name, orderCount: 0, baseQty: 0 };
+        current.orderCount += 1;
+        current.baseQty += Number(row.baseQty || 0);
+        counts.set(name, current);
+      }
+      return [...counts.values()].sort((a, b) => b.orderCount - a.orderCount || a.customer.localeCompare(b.customer));
+    }
+
+    function updateSortHeaders() {
+      document.querySelectorAll(".sort-header").forEach((button) => {
+        const active = button.dataset.sort === detailSort.key;
+        button.classList.toggle("active", active);
+        button.dataset.direction = active ? (detailSort.direction === "asc" ? "▲" : "▼") : "";
+      });
+    }
+
+    function renderDetailRows() {
+      const rows = sortedDetailRows();
+      const rowHeight = 36;
+      const headerHeight = 42;
+      $("ordersTableWrap").style.maxHeight = `${headerHeight + plannedRowLimit * rowHeight}px`;
+      document.querySelectorAll("[data-row-limit]").forEach((button) => {
+        button.classList.toggle("active", Number(button.dataset.rowLimit) === plannedRowLimit);
+      });
+      $("detailRows").innerHTML = rows.map((r) => `
+        <tr>
+          <td class="strong">${esc(r.orderNumber)}</td><td>${esc(r.customer)}</td><td><span class="status">${esc(r.status)}</span></td>
+          <td class="number">${fmt(r.baseQty)}</td><td>${esc(r.po || r.reference || "Pending")}</td><td>${esc(r.so || "Pending")}</td>
+          <td>${esc(date(r.appointmentTime))}</td><td>${esc(r.retailerName || "Pending")}</td><td>${esc(r.carrier || "Pending")}</td>
+        </tr>
+      `).join("") || `<tr><td colspan="9">No detail rows returned.</td></tr>`;
+      updateSortHeaders();
+    }
+
+    function renderDependentTables() {
+      const equipmentRows = filteredRows(latest?.inYardFullEquipment?.rows || []);
+      $("equipmentCount").textContent = `${fmt(equipmentRows.length)} rows`;
+      $("equipmentRows").innerHTML = equipmentRows.map((r) => `
+        <tr>
+          <td class="strong">${esc(r.equipmentNumber)}</td><td>${esc(r.entryTicket || "Pending")}</td><td>${esc(date(r.checkIn))}</td>
+          <td>${esc(r.timeInYard || "Pending")}</td><td>${esc(r.customer || "Pending")}</td><td>${esc(r.location || "Pending")}</td>
+        </tr>
+      `).join("") || `<tr><td colspan="6">No in-yard FULL equipment matched the Cotton logic.</td></tr>`;
+
+      const watchRows = filteredRows(latest?.watchList?.rows || []);
+      $("watchRows").innerHTML = watchRows.map((r) => `
+        <tr><td class="strong">${esc(r.orderNumber)}</td><td>${esc(r.customer)}</td><td><span class="status">${esc(r.status)}</span></td><td>${esc(date(r.created))}</td><td>${esc(r.carrier || "Pending")}</td></tr>
+      `).join("") || `<tr><td colspan="5">No watch-list orders right now.</td></tr>`;
+
+      renderDetailRows();
+    }
+
+    async function loadDashboard() {
+      if (!session) return;
+      setBusy(true, "Loading Cotton data from WISE...");
+      latest = await post("/api/dashboard", session);
+      render(latest);
+      setBusy(false, "");
+    }
+
+    function formatPair(working, completed) {
+      return `${String(Number(working || 0)).padStart(2, "0")}/${String(Number(completed || 0)).padStart(2, "0")}`;
+    }
+
+    async function loadAssignees() {
+      if (!session) return;
+      try {
+        $("assigneeCount").textContent = "Loading";
+        const data = await post("/api/assignees", session);
+        const assignees = data.assignees || [];
+        $("assigneeCount").textContent = `${fmt(assignees.length)} assignees`;
+        $("assigneeGrid").innerHTML = assignees.map((a) => `
+          <article class="assignee-card">
+            <div class="assignee-avatar" style="background:${avatarColor(a.name)}">${esc(initials(a.name))}</div>
+            <div>
+              <span title="${esc(a.name)}">${esc(a.name)}</span>
+              <strong>${formatPair(a.working, a.completed)}</strong>
+            </div>
+          </article>
+        `).join("") || `<div class="message">No Cotton assignees found.</div>`;
+      } catch (error) {
+        $("assigneeCount").textContent = "Unavailable";
+        $("assigneeGrid").innerHTML = `<div class="message">${esc(error.message || "Could not load assignees.")}</div>`;
+      }
+    }
+
+    function renderLiveSuggestions(sugData) {
+      if (!sugData || !sugData.suggestions || !sugData.suggestions.length) {
+        $("assignmentPanel").classList.add("hidden");
+        return;
+      }
+      const rows = sugData.suggestions;
+      $("assignmentPanel").classList.remove("hidden");
+      $("assignmentCount").textContent = `${fmt(rows.length)} tasks`;
+      $("assignmentNote").textContent = `Showing all assignable RNs, loads, and planned orders. Suggestions use ${sugData.lookbackMonths || 6} months of packed outbound and offloaded inbound history by customer. Tasks remain here until Auto Assign is clicked.`;
+      $("assignmentActions").classList.remove("hidden");
+      $("assignButton").classList.remove("hidden");
+      $("confirmAssignButton").classList.add("hidden");
+      $("confirmAutonomousButton").classList.add("hidden");
+      $("assignmentRows").innerHTML = rows.map((r) => `
+        <tr>
+          <td>${esc(r.workType || "Outbound Order")}</td>
+          <td class="strong">${esc(r.orderNumber || r.rn || "Pending")}</td>
+          <td>${esc(r.customer)}</td>
+          <td><span class="status">${esc(r.status)}</span></td>
+          <td>${esc(r.orderType || "Pending")}</td>
+          <td class="strong">${esc(r.suggestedAssignee)}</td>
+          <td class="number">${fmt(r.offloadedRnsForCustomer || r.packedOrdersForCustomer)}</td>
+          <td>${esc(r.source)}</td>
+        </tr>
+      `).join("") || `<tr><td colspan="8">No assignable tasks detected this cycle.</td></tr>`;
+    }
+
+    function renderAssignmentSuggestions(data) {
+      assignmentSuggestions = data;
+      const rows = data?.suggestions || [];
+      $("assignmentPanel").classList.remove("hidden");
+      $("assignmentCount").textContent = `${fmt(rows.length)} tasks`;
+      $("assignmentNote").textContent = `Using packed outbound history and offloaded inbound RN history from the past ${data.lookbackMonths || 6} months. Tasks rotate through the ranked employees for each customer.`;
+      $("assignmentActions").classList.remove("hidden");
+      $("assignButton").classList.remove("hidden");
+      $("confirmAssignButton").classList.add("hidden");
+      $("confirmAutonomousButton").classList.add("hidden");
+      $("assignmentRows").innerHTML = rows.map((r) => `
+        <tr>
+          <td>${esc(r.workType || "Outbound Order")}</td>
+          <td class="strong">${esc(r.orderNumber || r.rn || "Pending")}</td>
+          <td>${esc(r.customer)}</td>
+          <td><span class="status">${esc(r.status)}</span></td>
+          <td>${esc(r.orderType || "Pending")}</td>
+          <td class="strong">${esc(r.suggestedAssignee)}</td>
+          <td class="number">${fmt(r.offloadedRnsForCustomer || r.packedOrdersForCustomer)}</td>
+          <td>${esc(r.source)}</td>
+        </tr>
+      `).join("") || `<tr><td colspan="8">No planned orders or inbound RNs available for assignment suggestions.</td></tr>`;
+    }
+
+    async function loadAssignmentSuggestions(mode) {
+      if (!session) {
+        $("dashboardMessage").textContent = "Sign in and load Cotton first, then try the assignment buttons again.";
+        return;
+      }
+      try {
+        assignmentMode = mode;
+        $("assignmentPanel").classList.remove("hidden");
+        $("assignmentCount").textContent = "Loading";
+        $("assignmentNote").textContent = "Building suggestions from the past 6 months of packed and offloaded task history...";
+        $("assignmentActions").classList.add("hidden");
+        $("confirmAssignButton").classList.add("hidden");
+        $("confirmAutonomousButton").classList.add("hidden");
+        $("assignmentRows").innerHTML = `<tr><td colspan="8">Loading assignment suggestions...</td></tr>`;
+        $("assignmentPanel").scrollIntoView({ behavior: "smooth", block: "start" });
+        setBusy(true, mode === "suggest" ? "Building assignment suggestions..." : mode === "autonomous" ? "Building autonomous assignment plan..." : "Building assignment plan...");
+        const data = await post("/api/assignment-suggestions", session);
+        renderAssignmentSuggestions(data);
+        setBusy(false, mode === "suggest" ? "Assignment suggestions ready." : mode === "autonomous" ? "Autonomous assignment plan created. Review the suggestions before applying in WISE." : "Assignment plan created. Review the suggestions before applying in WISE.");
+      } catch (error) {
+        setBusy(false, error.message || "Could not build assignment suggestions.");
+      }
+    }
+
+    function formatRefreshStatus() {
+      if (!liveUpdatedAt) return "";
+      const parts = [`Last refreshed ${date(liveUpdatedAt)}`];
+      if (liveNextRefreshAt) {
+        const nextMs = new Date(liveNextRefreshAt).getTime();
+        const diffSec = Math.max(0, Math.round((nextMs - Date.now()) / 1000));
+        if (diffSec > 60) parts.push(`next in ${Math.ceil(diffSec / 60)} min`);
+        else if (diffSec > 0) parts.push(`next in ${diffSec}s`);
+        else parts.push("refreshing soon");
+      }
+      return parts.join(" · ");
+    }
+
+    function render(data) {
+      $("loginForm").classList.add("hidden");
+      $("dashboard").classList.remove("hidden");
+      $("refreshButton").classList.remove("hidden");
+      $("csvButton").classList.remove("hidden");
+      const refreshInfo = formatRefreshStatus();
+      $("subtitle").textContent = refreshInfo || `${data.siteLabel} - refreshed ${date(data.refreshedAt)}`;
+      $("stats").innerHTML = data.metrics.map((m) => `
+        ${m.label === "E-Comm Orders" || m.label === "E-Comm Past SLA" || m.label === "Older than 48 hours"
+          ? `<button class="card metric-${slug(m.label)}${tableFilter === (m.label === "E-Comm Orders" ? "ECOMM" : m.label === "E-Comm Past SLA" ? "DS24" : "OLDER48") ? " active" : ""}" type="button" data-table-filter="${m.label === "E-Comm Orders" ? "ECOMM" : m.label === "E-Comm Past SLA" ? "DS24" : "OLDER48"}"><i class="metric-icon">${metricIcon(m.label)}</i><span>${esc(m.label)}</span><strong>${fmt(m.value)}</strong><small>${esc(m.sub || "")}</small></button>`
+          : m.label === "Customers"
+            ? `<div class="metric-menu-wrap"><button class="card metric-${slug(m.label)}${selectedCustomer !== "ALL" ? " active" : ""}" type="button" data-customer-menu="true"><i class="metric-icon">${metricIcon(m.label)}</i><span>${esc(m.label)}</span><strong>${fmt(customerCounts().length)}</strong><small>${esc(selectedCustomer === "ALL" ? "Cotton facility" : selectedCustomer)}</small></button>${customerMenuOpen ? `<div class="customer-dropdown">${customerOptions().map(([value, label]) => `<button class="${selectedCustomer === value ? "active" : ""}" type="button" data-customer-select="${esc(value)}">${esc(label)}</button>`).join("")}</div>` : ""}</div>`
+            : `<article class="card metric-${slug(m.label)}"><i class="metric-icon">${metricIcon(m.label)}</i><span>${esc(m.label)}</span><strong>${fmt(m.value)}</strong><small>${esc(m.sub || "")}</small></article>`}
+      `).join("");
+      const customerMenuButton = document.querySelector("[data-customer-menu]");
+      if (customerMenuButton) {
+        customerMenuButton.addEventListener("click", () => {
+          customerMenuOpen = !customerMenuOpen;
+          render(data);
+        });
+      }
+      document.querySelectorAll("[data-customer-select]").forEach((button) => {
+        button.addEventListener("click", () => {
+          selectedCustomer = button.dataset.customerSelect || "ALL";
+          customerMenuOpen = false;
+          render(data);
+        });
+      });
+      document.querySelectorAll("[data-table-filter]").forEach((button) => {
+        button.addEventListener("click", () => {
+          tableFilter = tableFilter === button.dataset.tableFilter ? "ALL" : button.dataset.tableFilter;
+          render(data);
+        });
+      });
+      renderDependentTables();
+      if (!previewMode) loadAssignees();
+    }
+
+    function downloadCsv() {
+      if (!latest) return;
+      const headers = ["Order #", "Customer", "Status", "BASE QTY", "PO #", "SO #", "Appointment Time", "Retailer", "Carrier"];
+      const lines = [headers, ...latest.detailRows.map((r) => [
+        r.orderNumber, r.customer, r.status, r.baseQty, r.po || r.reference, r.so, date(r.appointmentTime), r.retailerName, r.carrier,
+      ])].map((row) => row.map((cell) => `"${String(cell ?? "").replace(/"/g, '""')}"`).join(","));
+      const blob = new Blob([lines.join("\n")], { type: "text/csv;charset=utf-8" });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement("a");
+      a.href = url;
+      a.download = "Cotton_Planned_Orders.csv";
+      a.click();
+      URL.revokeObjectURL(url);
+    }
+
+    $("loginForm").addEventListener("submit", async (event) => {
+      event.preventDefault();
+      try {
+        setBusy(true, "Signing in and finding Cotton facility...");
+        session = await post("/api/login", { username: $("username").value, password: $("password").value });
+        await loadDashboard();
+      } catch (error) {
+        setBusy(false, error.message || "Could not load dashboard.");
+      }
+    });
+    $("refreshButton").addEventListener("click", () => {
+      if (previewMode) return;
+      if (session) loadDashboard().catch((error) => setBusy(false, error.message));
+      else loadLiveData();
+    });
+    $("csvButton").addEventListener("click", downloadCsv);
+    document.querySelectorAll("[data-row-limit]").forEach((button) => {
+      button.addEventListener("click", () => {
+        plannedRowLimit = Number(button.dataset.rowLimit || 10);
+        renderDetailRows();
+      });
+    });
+    $("autoSuggestButton").addEventListener("click", () => {
+      if (!previewMode && liveCache_suggestions) {
+        renderLiveSuggestions(liveCache_suggestions);
+        $("assignmentPanel").scrollIntoView({ behavior: "smooth", block: "start" });
+        return;
+      }
+      if (session) loadAssignmentSuggestions("suggest");
+    });
+    $("autoAssignButton").addEventListener("click", () => {
+      if (!previewMode && liveCache_suggestions) {
+        renderLiveSuggestions(liveCache_suggestions);
+        $("assignmentPanel").scrollIntoView({ behavior: "smooth", block: "start" });
+        $("assignButton").click();
+        return;
+      }
+      if (session) loadAssignmentSuggestions("assign");
+    });
+    $("autonomousButton").addEventListener("click", () => {
+      if (!previewMode && liveCache_suggestions) {
+        assignmentMode = "autonomous";
+        renderLiveSuggestions(liveCache_suggestions);
+        $("assignmentPanel").scrollIntoView({ behavior: "smooth", block: "start" });
+        $("assignButton").click();
+        return;
+      }
+      if (session) loadAssignmentSuggestions("autonomous");
+    });
+    $("assignButton").addEventListener("click", () => {
+      if (assignmentMode === "autonomous") {
+        $("confirmAutonomousButton").classList.remove("hidden");
+        $("confirmAssignButton").classList.add("hidden");
+      } else {
+        $("confirmAssignButton").classList.remove("hidden");
+        $("confirmAutonomousButton").classList.add("hidden");
+      }
+      $("dashboardMessage").textContent = "";
+    });
+    $("confirmAssignButton").addEventListener("click", () => {
+      $("dashboardMessage").textContent = "Assignment endpoint has not been verified through WISE API discovery. No WISE tasks were changed. Tasks remain in Auto Suggest for review.";
+      $("confirmAssignButton").classList.add("hidden");
+    });
+    $("confirmAutonomousButton").addEventListener("click", () => {
+      $("dashboardMessage").textContent = "Autonomous assignment endpoint has not been verified through WISE API discovery. No WISE tasks were changed. Tasks remain in Auto Suggest for review.";
+      $("confirmAutonomousButton").classList.add("hidden");
+    });
+    document.querySelectorAll(".sort-header").forEach((button) => {
+      button.addEventListener("click", () => {
+        const key = button.dataset.sort;
+        if (!key) return;
+        detailSort = {
+          key,
+          direction: detailSort.key === key && detailSort.direction === "asc" ? "desc" : "asc",
+        };
+        renderDetailRows();
+      });
+    });
+    const CACHE_TTL_MS = 10 * 60 * 1000;
+
+    if (previewMode) {
+      const demoRows = [
+        ["DN-80359", "PEPSICO", "8395249247", "7816917037", "ORG-1074"],
+        ["DN-81185", "PEPSICO", "8395401358", "7817042808", "ORG-505213"],
+        ["DN-81164", "PEPSICO", "8395187828", "7816923458", "ORG-378950"],
+        ["DN-81294", "GOLDEN BULL MARKETING", "5KG2IPYA", "113-9548912-1811446", "ORG-360126"],
+        ["DN-81291", "PEPSICO", "8395199624", "7817046329", "ORG-379267"],
+        ["DN-81292", "PEPSICO", "8395221142", "7817020382", "ORG-378250"],
+        ["DN-81247", "PEPSICO", "8395380371", "7817059648", "ORG-378950"],
+        ["DN-81289", "PEPSICO", "8395362565", "7816694816", "ORG-1074"],
+        ["DN-81230", "PEPSICO", "8395372563", "7816817999", "ORG-501842"],
+        ["DN-81253", "ONLINE RETAILER RETURN FACILITY", "8395380153", "Return", "ORG-378950"],
+      ].map((row, index) => ({
+        orderNumber: row[0],
+        customer: row[1],
+        status: "PLANNED",
+        baseQty: 0,
+        po: row[2],
+        so: row[3],
+        appointmentTime: new Date(Date.now() + index * 36e5).toISOString(),
+        retailerName: row[1] === "GOLDEN BULL MARKETING" ? "AMAZON.COM" : row[1],
+        carrier: row[4],
+      }));
+      const demo = {
+        siteLabel: "Cotton (LT_F34)",
+        refreshedAt: new Date().toISOString(),
+        metrics: [
+          { label: "In-Yard FULL Equipment", value: 0, sub: "Not yet devanned" },
+          { label: "Customers", value: 7, sub: "Cotton facility" },
+          { label: "Planned FTL/LTL Orders", value: 10, sub: "All customers" },
+          { label: "Older than 48 hours", value: 4, sub: "Pending non-Dropship" },
+          { label: "E-Comm Orders", value: 1, sub: "Planned Orders" },
+          { label: "E-Comm Past SLA", value: 0, sub: "Planned Orders" },
+        ],
+        customerRows: [{ customer: "PEPSICO", orderCount: 9 }, { customer: "GOLDEN BULL MARKETING", orderCount: 1 }],
+        inYardFullEquipment: { rows: [] },
+        watchList: { rows: [] },
+        detailRows: demoRows,
+        dropshipOlderThan24Rows: [],
+      };
+      latest = demo;
+      render(demo);
+      const names = ["BRIAN ALEJANDRO MENDOZA", "ULISES OROPEZA BERNAL", "HENRY ALONSO LOPEZ T...", "JESUS EMMANUEL JAIME", "GRACIELA ORTEGA", "SULEMA RODELAS", "VIOLA ZAMORA SLONE", "GUSTAVO LEON CARDOZO"];
+      const counts = ["00/2509", "00/2070", "00/1983", "01/1888", "00/1573", "00/1467", "00/1310", "00/1001"];
+      $("assigneeCount").textContent = "51 assignees";
+      $("assigneeGrid").innerHTML = names.map((name, index) => `
+        <article class="assignee-card">
+          <div class="assignee-avatar" style="background:${avatarColor(name)}">${esc(initials(name))}</div>
+          <div><span title="${esc(name)}">${esc(name)}</span><strong>${counts[index]}</strong></div>
+        </article>
+      `).join("") + `<article class="assignee-card"><div></div><div><span>...</span><strong style="color:#5f8cff;font-size:13px;">View all assignees</strong></div></article>`;
+    } else {
+      $("loginForm").classList.add("hidden");
+      $("dashboard").classList.remove("hidden");
+      $("subtitle").textContent = "Loading live data...";
+      loadLiveData();
+      liveRefreshTimer = setInterval(loadLiveData, CACHE_TTL_MS);
+    }
+
+    function showUnavailable(message) {
+      $("loginForm").classList.add("hidden");
+      $("dashboard").classList.remove("hidden");
+      $("refreshButton").classList.remove("hidden");
+      $("csvButton").classList.add("hidden");
+      $("subtitle").textContent = message || "Live data unavailable";
+      $("stats").innerHTML = `<div style="grid-column:1/-1;text-align:center;padding:40px 20px;color:#a8b8d4;font-size:15px;font-weight:700;">${esc(message || "Dashboard data is currently unavailable. It will automatically retry.")}</div>`;
+      $("equipmentCount").textContent = "0 rows";
+      $("equipmentRows").innerHTML = "";
+      $("detailRows").innerHTML = "";
+      $("assigneeCount").textContent = "Unavailable";
+      $("assigneeGrid").innerHTML = "";
+      $("watchRows").innerHTML = "";
+    }
+
+    async function loadLiveData() {
+      try {
+        const res = await fetch("/api/live-dashboard");
+        const json = await res.json().catch(() => ({}));
+        if (!res.ok || json.status !== "ok") {
+          showUnavailable(json.message || "Dashboard data is loading. Please wait...");
+          if (json.status === "loading") setTimeout(loadLiveData, 5000);
+          return;
+        }
+        liveUpdatedAt = json.updatedAt;
+        liveNextRefreshAt = json.nextRefreshAt;
+        latest = json.dashboard;
+        render(json.dashboard);
+        if (json.assignees) {
+          const assignees = json.assignees.assignees || [];
+          $("assigneeCount").textContent = `${fmt(assignees.length)} assignees`;
+          $("assigneeGrid").innerHTML = assignees.map((a) => `
+            <article class="assignee-card">
+              <div class="assignee-avatar" style="background:${avatarColor(a.name)}">${esc(initials(a.name))}</div>
+              <div>
+                <span title="${esc(a.name)}">${esc(a.name)}</span>
+                <strong>${formatPair(a.working, a.completed)}</strong>
+              </div>
+            </article>
+          `).join("") || `<div class="message">No Cotton assignees found.</div>`;
+        }
+        if (json.suggestions) {
+          liveCache_suggestions = json.suggestions;
+          $("liveInfoBar").classList.remove("hidden");
+          renderLiveSuggestions(json.suggestions);
+        }
+      } catch (err) {
+        showUnavailable("Could not reach the dashboard server. Retrying...");
+      }
+    }
+  </script>
+</body>
+</html>

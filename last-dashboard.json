@@ -1,0 +1,421 @@
+{
+  "title": "Cotton",
+  "siteLabel": "Cotton (LT_F34)",
+  "source": "WISE",
+  "refreshedAt": "2026-06-06T00:29:29.230Z",
+  "generatedAt": "2026-06-06T00:29:29.230Z",
+  "facility": {
+    "id": "LT_F34",
+    "name": "Cotton",
+    "timeZone": "America/Phoenix",
+    "accountingCode": "885",
+    "facilitySetting": {
+      "lpLabelSize": "TOW_ONE",
+      "allowOTControl": null,
+      "allowWorkAssignment": null,
+      "appRequiredEmployeeCodeBinding": true
+    }
+  },
+  "metrics": [
+    {
+      "label": "In-Yard FULL Equipment",
+      "value": 0,
+      "sub": "not yet devanned"
+    },
+    {
+      "label": "Customers",
+      "value": 7,
+      "sub": "Cotton facility"
+    },
+    {
+      "label": "Planned FTL/LTL Orders",
+      "value": 10,
+      "sub": "All customers"
+    },
+    {
+      "label": "Older than 48 hours",
+      "value": 6,
+      "sub": "Pending non-Dropship"
+    },
+    {
+      "label": "E-Comm Orders",
+      "value": 1,
+      "sub": "Planned Orders"
+    },
+    {
+      "label": "E-Comm Past SLA",
+      "value": 1,
+      "sub": "Planned Orders"
+    }
+  ],
+  "inYardFullEquipment": {
+    "supported": true,
+    "rows": [],
+    "candidateCount": 0
+  },
+  "pivot": {
+    "supported": true,
+    "rows": [
+      {
+        "customer": "PEPSICO",
+        "orderCount": 8,
+        "baseQty": 0
+      },
+      {
+        "customer": "GOLDEN BULL MARKETING",
+        "orderCount": 1,
+        "baseQty": 0
+      },
+      {
+        "customer": "SCHINDLER ELEVATOR CORPORATION",
+        "orderCount": 1,
+        "baseQty": 0
+      }
+    ]
+  },
+  "watchList": {
+    "supported": true,
+    "rows": []
+  },
+  "detailRows": [
+    {
+      "orderNumber": "DN-81294",
+      "customer": "GOLDEN BULL MARKETING",
+      "customerId": "ORG-557389",
+      "status": "PLANNED",
+      "reference": "1800195871",
+      "created": "2026-06-04T14:28:21",
+      "shipMethod": "SP",
+      "carrier": "ORG-360126",
+      "carrierId": "ORG-360126",
+      "scheduleDate": "2026-06-08T00:00:00",
+      "mabd": "",
+      "appointmentTime": "2026-06-08T00:00:00",
+      "retailerName": "AMAZON.COM",
+      "orderType": "DS",
+      "source": "PUBLIC_API",
+      "baseQty": 0,
+      "palletQty": 0,
+      "po": "5KG2IPYA",
+      "so": "113-9548912-1811446",
+      "loadNo": "",
+      "shipToName": "XXXXX"
+    },
+    {
+      "orderNumber": "DN-81291",
+      "customer": "PEPSICO",
+      "customerId": "ORG-368074",
+      "status": "PLANNED",
+      "reference": "8395199624",
+      "created": "2026-06-04T14:05:33",
+      "shipMethod": "TL",
+      "carrier": "ORG-379267",
+      "carrierId": "ORG-379267",
+      "scheduleDate": "2026-06-09T00:00:00",
+      "mabd": "2026-06-10T00:00:00",
+      "appointmentTime": "2026-06-08T10:00:00",
+      "retailerName": "PEPSICO",
+      "orderType": "RG",
+      "source": "EDI",
+      "baseQty": 0,
+      "palletQty": 0,
+      "po": "8395199624",
+      "so": "7617046329",
+      "loadNo": "78152473",
+      "shipToName": "QUAKER DC SAN BERN CA SRV CTR"
+    },
+    {
+      "orderNumber": "DN-81292",
+      "customer": "PEPSICO",
+      "customerId": "ORG-368074",
+      "status": "PLANNED",
+      "reference": "8395221142",
+      "created": "2026-06-04T14:05:33",
+      "shipMethod": "TL",
+      "carrier": "ORG-378250",
+      "carrierId": "ORG-378250",
+      "scheduleDate": "2026-06-09T00:00:00",
+      "mabd": "2026-06-10T00:00:00",
+      "appointmentTime": "2026-06-08T10:00:00",
+      "retailerName": "PEPSICO",
+      "orderType": "RG",
+      "source": "EDI",
+      "baseQty": 0,
+      "palletQty": 0,
+      "po": "8395221142",
+      "so": "7617020382",
+      "loadNo": "78152472",
+      "shipToName": "QUAKER DC SAN BERN CA SRV CTR"
+    },
+    {
+      "orderNumber": "DN-81289",
+      "customer": "PEPSICO",
+      "customerId": "ORG-368074",
+      "status": "PLANNED",
+      "reference": "8395362565",
+      "created": "2026-06-04T12:45:33",
+      "shipMethod": "TL",
+      "carrier": "ORG-1074",
+      "carrierId": "ORG-1074",
+      "scheduleDate": "2026-06-08T00:00:00",
+      "mabd": "2026-06-10T00:00:00",
+      "appointmentTime": "2026-06-08T14:00:00",
+      "retailerName": "PEPSICO",
+      "orderType": "RG",
+      "source": "EDI",
+      "baseQty": 0,
+      "palletQty": 0,
+      "po": "8395362565",
+      "so": "7616994816",
+      "loadNo": "78136593",
+      "shipToName": "GATORADE DC TRACY CA"
+    },
+    {
+      "orderNumber": "DN-81248",
+      "customer": "SCHINDLER ELEVATOR CORPORATION",
+      "customerId": "ORG-594369",
+      "status": "PLANNED",
+      "reference": "0000702739",
+      "created": "2026-06-03T16:17:34",
+      "shipMethod": "TL",
+      "carrier": "ORG-379041",
+      "carrierId": "ORG-379041",
+      "scheduleDate": "",
+      "mabd": "2026-06-11T00:00:00",
+      "appointmentTime": "2026-06-10T13:00:00",
+      "retailerName": "SCHINDLER ELEVATOR CORP",
+      "orderType": "RG",
+      "source": "EDI",
+      "baseQty": 0,
+      "palletQty": 0,
+      "po": "4700772898",
+      "so": "",
+      "loadNo": "R7584768",
+      "shipToName": "UPTOWN COMMONS"
+    },
+    {
+      "orderNumber": "DN-81247",
+      "customer": "PEPSICO",
+      "customerId": "ORG-368074",
+      "status": "PLANNED",
+      "reference": "8395396371",
+      "created": "2026-06-03T15:35:32",
+      "shipMethod": "TL",
+      "carrier": "ORG-378950",
+      "carrierId": "ORG-378950",
+      "scheduleDate": "2026-06-08T00:00:00",
+      "mabd": "2026-06-11T00:00:00",
+      "appointmentTime": "2026-06-08T12:00:00",
+      "retailerName": "PEPSICO",
+      "orderType": "RG",
+      "source": "EDI",
+      "baseQty": 0,
+      "palletQty": 0,
+      "po": "8395396371",
+      "so": "7617089648",
+      "loadNo": "78136615",
+      "shipToName": "QUAKER DC DALLAS TX"
+    },
+    {
+      "orderNumber": "DN-81230",
+      "customer": "PEPSICO",
+      "customerId": "ORG-368074",
+      "status": "PLANNED",
+      "reference": "8395372563",
+      "created": "2026-06-03T11:55:30",
+      "shipMethod": "TL",
+      "carrier": "ORG-501842",
+      "carrierId": "ORG-501842",
+      "scheduleDate": "2026-06-08T00:00:00",
+      "mabd": "2026-06-09T00:00:00",
+      "appointmentTime": "2026-06-08T14:00:00",
+      "retailerName": "PEPSICO",
+      "orderType": "RG",
+      "source": "EDI",
+      "baseQty": 0,
+      "palletQty": 0,
+      "po": "8395372563",
+      "so": "7616817999",
+      "loadNo": "78152471",
+      "shipToName": "QUAKER DC SAN BERN CA SRV CTR"
+    },
+    {
+      "orderNumber": "DN-81185",
+      "customer": "PEPSICO",
+      "customerId": "ORG-368074",
+      "status": "PLANNED",
+      "reference": "8395401358",
+      "created": "2026-06-02T15:15:28",
+      "shipMethod": "TL",
+      "carrier": "ORG-595213",
+      "carrierId": "ORG-595213",
+      "scheduleDate": "2026-06-05T00:00:00",
+      "mabd": "2026-06-06T00:00:00",
+      "appointmentTime": "2026-06-05T12:00:00",
+      "retailerName": "PEPSICO",
+      "orderType": "RG",
+      "source": "EDI",
+      "baseQty": 0,
+      "palletQty": 0,
+      "po": "8395401358",
+      "so": "7617042808",
+      "loadNo": "78136600",
+      "shipToName": "QUAKER DC SAN BERN CA SRV CTR"
+    },
+    {
+      "orderNumber": "DN-81164",
+      "customer": "PEPSICO",
+      "customerId": "ORG-368074",
+      "status": "PLANNED",
+      "reference": "8395187828",
+      "created": "2026-06-02T10:35:31",
+      "shipMethod": "TL",
+      "carrier": "ORG-378950",
+      "carrierId": "ORG-378950",
+      "scheduleDate": "2026-06-02T00:00:00",
+      "mabd": "2026-06-04T00:00:00",
+      "appointmentTime": "2026-06-08T10:00:00",
+      "retailerName": "PEPSICO",
+      "orderType": "RG",
+      "source": "EDI",
+      "baseQty": 0,
+      "palletQty": 0,
+      "po": "8395187828",
+      "so": "7616923458",
+      "loadNo": "78102895",
+      "shipToName": "QUAKER DC DALLAS TX"
+    },
+    {
+      "orderNumber": "DN-80959",
+      "customer": "PEPSICO",
+      "customerId": "ORG-368074",
+      "status": "PLANNED",
+      "reference": "8395249247",
+      "created": "2026-05-29T15:15:17",
+      "shipMethod": "TL",
+      "carrier": "ORG-1074",
+      "carrierId": "ORG-1074",
+      "scheduleDate": "2026-06-03T00:00:00",
+      "mabd": "2026-06-05T00:00:00",
+      "appointmentTime": "2026-06-08T13:00:00",
+      "retailerName": "PEPSICO",
+      "orderType": "RG",
+      "source": "EDI",
+      "baseQty": 0,
+      "palletQty": 0,
+      "po": "8395249247",
+      "so": "7616917037",
+      "loadNo": "78102894",
+      "shipToName": "QUAKER DC DALLAS TX"
+    }
+  ],
+  "dropshipOlderThan24Rows": [
+    {
+      "orderNumber": "DN-81294",
+      "customer": "GOLDEN BULL MARKETING",
+      "customerId": "ORG-557389",
+      "status": "PLANNED",
+      "reference": "1800195871",
+      "created": "2026-06-04T14:28:21",
+      "shipMethod": "SP",
+      "carrier": "ORG-360126",
+      "carrierId": "ORG-360126",
+      "scheduleDate": "2026-06-08T00:00:00",
+      "mabd": "",
+      "appointmentTime": "2026-06-08T00:00:00",
+      "retailerName": "AMAZON.COM",
+      "orderType": "DS",
+      "source": "PUBLIC_API",
+      "baseQty": 0,
+      "palletQty": 0,
+      "po": "5KG2IPYA",
+      "so": "113-9548912-1811446",
+      "loadNo": "",
+      "shipToName": "XXXXX"
+    }
+  ],
+  "customerRows": [
+    {
+      "customer": "GOLDEN BULL MARKETING",
+      "orderCount": 7185
+    },
+    {
+      "customer": "RECESS",
+      "orderCount": 3979
+    },
+    {
+      "customer": "F3 ENERGY LLC",
+      "orderCount": 854
+    },
+    {
+      "customer": "DOYLE FARRIS",
+      "orderCount": 130
+    },
+    {
+      "customer": "ZURU LLC",
+      "orderCount": 21
+    },
+    {
+      "customer": "PEPSICO",
+      "orderCount": 8
+    },
+    {
+      "customer": "SCHINDLER ELEVATOR CORPORATION",
+      "orderCount": 1
+    }
+  ],
+  "diagnostics": [
+    {
+      "label": "Facility filter",
+      "value": "Cotton"
+    },
+    {
+      "label": "WISE endpoint",
+      "value": "/wms/outbound/order/search-by-paging"
+    },
+    {
+      "label": "Statuses",
+      "value": "PLANNED"
+    },
+    {
+      "label": "Customer filter",
+      "value": "All Cotton customers"
+    },
+    {
+      "label": "Equipment logic",
+      "value": "CONTAINER + FULL + FULL_TO_OFFLOAD"
+    },
+    {
+      "label": "E-Comm planned order count",
+      "value": "1 unique PLANNED DS orders"
+    },
+    {
+      "label": "Older than 48 hours",
+      "value": "6 pending non-Dropship orders"
+    },
+    {
+      "label": "DS older than 24 hours",
+      "value": "1 unique PLANNED DS orders"
+    },
+    {
+      "label": "All-status DS order count",
+      "value": "12168 unique DS orders"
+    },
+    {
+      "label": "All-status DS row count",
+      "value": "12168"
+    },
+    {
+      "label": "Raw dropship query rows",
+      "value": "17538"
+    },
+    {
+      "label": "Quantity fields found",
+      "value": "adjustedPalletQty, estCasePickQty, estPalletPickQty, estPiecePickQty, isSingleQTY, itemLineTotalQty, maxCartonQty, orderCartonQty, sameConsolidationNoQty"
+    },
+    {
+      "label": "Raw order rows",
+      "value": "10"
+    }
+  ]
+}

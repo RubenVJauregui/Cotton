@@ -1,0 +1,324 @@
+{
+  "facility": {
+    "id": "LT_F34",
+    "name": "Cotton",
+    "timeZone": "America/Phoenix",
+    "accountingCode": "885",
+    "facilitySetting": {
+      "lpLabelSize": "TOW_ONE",
+      "allowOTControl": null,
+      "allowWorkAssignment": null,
+      "appRequiredEmployeeCodeBinding": true
+    }
+  },
+  "lookbackDays": 60,
+  "taskRows": 16752,
+  "assignees": [
+    {
+      "name": "BRIAN ALEJANDRO MENDOZA",
+      "taskCount": 2508,
+      "working": 0,
+      "completed": 2509
+    },
+    {
+      "name": "ULISES OROPEZA BERNAL",
+      "taskCount": 2014,
+      "working": 0,
+      "completed": 2070
+    },
+    {
+      "name": "Henry Alonso Lopez Torres",
+      "taskCount": 2003,
+      "working": 0,
+      "completed": 1983
+    },
+    {
+      "name": "Jesus Emmanuel Jaime",
+      "taskCount": 1792,
+      "working": 1,
+      "completed": 1888
+    },
+    {
+      "name": "GRACIELA ORTEGA",
+      "taskCount": 1811,
+      "working": 0,
+      "completed": 1573
+    },
+    {
+      "name": "SULEMA RODELAS",
+      "taskCount": 1468,
+      "working": 0,
+      "completed": 1467
+    },
+    {
+      "name": "VIOLA ZAMORA SLONE",
+      "taskCount": 1307,
+      "working": 0,
+      "completed": 1310
+    },
+    {
+      "name": "GUSTAVO LEON CARDOZO",
+      "taskCount": 817,
+      "working": 0,
+      "completed": 1001
+    },
+    {
+      "name": "ULISES OROPEZA",
+      "taskCount": 772,
+      "working": 0,
+      "completed": 988
+    },
+    {
+      "name": "KEVIN SCHROEDER",
+      "taskCount": 432,
+      "working": 2,
+      "completed": 427
+    },
+    {
+      "name": "Gonzalo Garcia",
+      "taskCount": 250,
+      "working": 0,
+      "completed": 250
+    },
+    {
+      "name": "Jaime Garcia",
+      "taskCount": 244,
+      "working": 0,
+      "completed": 244
+    },
+    {
+      "name": "ostorr",
+      "taskCount": 140,
+      "working": 0,
+      "completed": 140
+    },
+    {
+      "name": "alex reznik",
+      "taskCount": 127,
+      "working": 0,
+      "completed": 127
+    },
+    {
+      "name": "oscar torres",
+      "taskCount": 116,
+      "working": 0,
+      "completed": 116
+    },
+    {
+      "name": "JOSE MANUEL NATHAN ORTEGA CAZARES",
+      "taskCount": 109,
+      "working": 1,
+      "completed": 111
+    },
+    {
+      "name": "Eric Sabastian Munoz",
+      "taskCount": 106,
+      "working": 3,
+      "completed": 103
+    },
+    {
+      "name": "Omar Beltran",
+      "taskCount": 68,
+      "working": 0,
+      "completed": 96
+    },
+    {
+      "name": "manuel rodriguez",
+      "taskCount": 91,
+      "working": 0,
+      "completed": 91
+    },
+    {
+      "name": "Yulizan Videaux Leyva",
+      "taskCount": 85,
+      "working": 5,
+      "completed": 80
+    },
+    {
+      "name": "Jacob Alexander Angel",
+      "taskCount": 67,
+      "working": 0,
+      "completed": 67
+    },
+    {
+      "name": "KARINA GARCIA",
+      "taskCount": 90,
+      "working": 9,
+      "completed": 22
+    },
+    {
+      "name": "Rafael Velez Jr",
+      "taskCount": 24,
+      "working": 0,
+      "completed": 24
+    },
+    {
+      "name": "ABISMAEL ZACHARIAS ROBINSON MARADIAGA",
+      "taskCount": 18,
+      "working": 0,
+      "completed": 18
+    },
+    {
+      "name": "frdlopez",
+      "taskCount": 16,
+      "working": 0,
+      "completed": 16
+    },
+    {
+      "name": "julio cesar chavez",
+      "taskCount": 15,
+      "working": 8,
+      "completed": 7
+    },
+    {
+      "name": "NELSON SANTOS",
+      "taskCount": 13,
+      "working": 0,
+      "completed": 13
+    },
+    {
+      "name": "EDGAR GUANESPEN",
+      "taskCount": 9,
+      "working": 0,
+      "completed": 9
+    },
+    {
+      "name": "Omar Mclaughlin",
+      "taskCount": 8,
+      "working": 0,
+      "completed": 8
+    },
+    {
+      "name": "Jeff Garrett",
+      "taskCount": 95,
+      "working": 0,
+      "completed": 7
+    },
+    {
+      "name": "ERCILIA RASCON RAMOS",
+      "taskCount": 19,
+      "working": 0,
+      "completed": 6
+    },
+    {
+      "name": "Carlos Lopez",
+      "taskCount": 6,
+      "working": 0,
+      "completed": 5
+    },
+    {
+      "name": "HENRY ALONSO LOPEZ TORRES",
+      "taskCount": 4,
+      "working": 0,
+      "completed": 4
+    },
+    {
+      "name": "Waddell Security",
+      "taskCount": 4,
+      "working": 0,
+      "completed": 4
+    },
+    {
+      "name": "Jerry Major",
+      "taskCount": 3,
+      "working": 0,
+      "completed": 3
+    },
+    {
+      "name": "David Renteria 2",
+      "taskCount": 2,
+      "working": 0,
+      "completed": 2
+    },
+    {
+      "name": "fREDDIE LOPEZ",
+      "taskCount": 2,
+      "working": 0,
+      "completed": 2
+    },
+    {
+      "name": "Golden User",
+      "taskCount": 48,
+      "working": 0,
+      "completed": 2
+    },
+    {
+      "name": "Lexus Morales",
+      "taskCount": 2,
+      "working": 0,
+      "completed": 2
+    },
+    {
+      "name": "Louie Antonio Bocanegra",
+      "taskCount": 2,
+      "working": 0,
+      "completed": 2
+    },
+    {
+      "name": "Orders Golden Bull Marketing",
+      "taskCount": 17,
+      "working": 0,
+      "completed": 2
+    },
+    {
+      "name": "Dennis Delos Reyes",
+      "taskCount": 1,
+      "working": 1,
+      "completed": 0
+    },
+    {
+      "name": "ESMERALDA CASTILLO",
+      "taskCount": 3,
+      "working": 0,
+      "completed": 1
+    },
+    {
+      "name": "GONZALO GARCIA",
+      "taskCount": 1,
+      "working": 1,
+      "completed": 0
+    },
+    {
+      "name": "JESUS EMMANUEL JAIME",
+      "taskCount": 1,
+      "working": 0,
+      "completed": 1
+    },
+    {
+      "name": "Jose Villasenor",
+      "taskCount": 1,
+      "working": 0,
+      "completed": 1
+    },
+    {
+      "name": "Waddell Schindler Outbound",
+      "taskCount": 1,
+      "working": 1,
+      "completed": 0
+    },
+    {
+      "name": "JIANMING TANG",
+      "taskCount": 9,
+      "working": 0,
+      "completed": 0
+    },
+    {
+      "name": "Lexus Moreles",
+      "taskCount": 1,
+      "working": 0,
+      "completed": 0
+    },
+    {
+      "name": "OMAR CHAVEZ",
+      "taskCount": 4,
+      "working": 0,
+      "completed": 0
+    },
+    {
+      "name": "Waddell GBM Outbound",
+      "taskCount": 2,
+      "working": 0,
+      "completed": 0
+    }
+  ]
+}

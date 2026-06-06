@@ -1,0 +1,158 @@
+{
+  "facility": {
+    "id": "LT_F34",
+    "name": "Cotton",
+    "timeZone": "America/Phoenix",
+    "accountingCode": "885",
+    "facilitySetting": {
+      "lpLabelSize": "TOW_ONE",
+      "allowOTControl": null,
+      "allowWorkAssignment": null,
+      "appRequiredEmployeeCodeBinding": true
+    }
+  },
+  "lookbackMonths": 6,
+  "plannedOrders": 10,
+  "inboundRns": 0,
+  "packedTaskRows": 2931,
+  "offloadTaskRows": 0,
+  "offloadTaskErrors": [
+    "/wms-bam/inbound/offload-task/search-by-paging: API request failed: 404",
+    "/wms-bam/inbound/receive-task/search-by-paging: fetch failed",
+    "/wms-bam/inbound/receiving-task/search-by-paging: fetch failed",
+    "/wms-bam/inbound/unload-task/search-by-paging: fetch failed",
+    "/wms-bam/yard/equipment/search: fetch failed"
+  ],
+  "suggestions": [
+    {
+      "workType": "Outbound Order",
+      "orderNumber": "DN-81294",
+      "rn": "",
+      "customer": "GOLDEN BULL MARKETING",
+      "status": "PLANNED",
+      "orderType": "DS",
+      "suggestedAssignee": "brian mendoza",
+      "packedOrdersForCustomer": 479,
+      "offloadedRnsForCustomer": 0,
+      "rank": 1,
+      "source": "Customer 6-month packed history"
+    },
+    {
+      "workType": "Outbound Order",
+      "orderNumber": "DN-81291",
+      "rn": "",
+      "customer": "PEPSICO",
+      "status": "PLANNED",
+      "orderType": "RG",
+      "suggestedAssignee": "Jesus Emmanuel Jaime",
+      "packedOrdersForCustomer": 64,
+      "offloadedRnsForCustomer": 0,
+      "rank": 1,
+      "source": "Customer 6-month packed history"
+    },
+    {
+      "workType": "Outbound Order",
+      "orderNumber": "DN-81292",
+      "rn": "",
+      "customer": "PEPSICO",
+      "status": "PLANNED",
+      "orderType": "RG",
+      "suggestedAssignee": "oscar torres",
+      "packedOrdersForCustomer": 63,
+      "offloadedRnsForCustomer": 0,
+      "rank": 2,
+      "source": "Customer 6-month packed history"
+    },
+    {
+      "workType": "Outbound Order",
+      "orderNumber": "DN-81289",
+      "rn": "",
+      "customer": "PEPSICO",
+      "status": "PLANNED",
+      "orderType": "RG",
+      "suggestedAssignee": "Jaime Garcia",
+      "packedOrdersForCustomer": 59,
+      "offloadedRnsForCustomer": 0,
+      "rank": 3,
+      "source": "Customer 6-month packed history"
+    },
+    {
+      "workType": "Outbound Order",
+      "orderNumber": "DN-81248",
+      "rn": "",
+      "customer": "SCHINDLER ELEVATOR CORPORATION",
+      "status": "PLANNED",
+      "orderType": "RG",
+      "suggestedAssignee": "ULISES OROPEZA BERNAL",
+      "packedOrdersForCustomer": 2,
+      "offloadedRnsForCustomer": 0,
+      "rank": 1,
+      "source": "Customer 6-month packed history"
+    },
+    {
+      "workType": "Outbound Order",
+      "orderNumber": "DN-81247",
+      "rn": "",
+      "customer": "PEPSICO",
+      "status": "PLANNED",
+      "orderType": "RG",
+      "suggestedAssignee": "manuel rodriguez",
+      "packedOrdersForCustomer": 59,
+      "offloadedRnsForCustomer": 0,
+      "rank": 4,
+      "source": "Customer 6-month packed history"
+    },
+    {
+      "workType": "Outbound Order",
+      "orderNumber": "DN-81230",
+      "rn": "",
+      "customer": "PEPSICO",
+      "status": "PLANNED",
+      "orderType": "RG",
+      "suggestedAssignee": "Gonzalo Garcia",
+      "packedOrdersForCustomer": 47,
+      "offloadedRnsForCustomer": 0,
+      "rank": 5,
+      "source": "Customer 6-month packed history"
+    },
+    {
+      "workType": "Outbound Order",
+      "orderNumber": "DN-81185",
+      "rn": "",
+      "customer": "PEPSICO",
+      "status": "PLANNED",
+      "orderType": "RG",
+      "suggestedAssignee": "KARINA GARCIA",
+      "packedOrdersForCustomer": 16,
+      "offloadedRnsForCustomer": 0,
+      "rank": 6,
+      "source": "Customer 6-month packed history"
+    },
+    {
+      "workType": "Outbound Order",
+      "orderNumber": "DN-81164",
+      "rn": "",
+      "customer": "PEPSICO",
+      "status": "PLANNED",
+      "orderType": "RG",
+      "suggestedAssignee": "ABISMAEL ZACHARIAS ROBINSON MARADIAGA",
+      "packedOrdersForCustomer": 6,
+      "offloadedRnsForCustomer": 0,
+      "rank": 7,
+      "source": "Customer 6-month packed history"
+    },
+    {
+      "workType": "Outbound Order",
+      "orderNumber": "DN-80959",
+      "rn": "",
+      "customer": "PEPSICO",
+      "status": "PLANNED",
+      "orderType": "RG",
+      "suggestedAssignee": "Carlos Lopez",
+      "packedOrdersForCustomer": 1,
+      "offloadedRnsForCustomer": 0,
+      "rank": 8,
+      "source": "Customer 6-month packed history"
+    }
+  ]
+}
