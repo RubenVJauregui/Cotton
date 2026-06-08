@@ -1171,57 +1171,45 @@
     });
     const CACHE_TTL_MS = 10 * 60 * 1000;
 
+    async function loadStaticData() {
+      try {
+        const [dashboard, assignees, suggestions] = await Promise.all([
+          fetch("last-dashboard.json").then((r) => r.json()),
+          fetch("last-assignees.json").then((r) => r.json()).catch(() => null),
+          fetch("last-assignment-suggestions.json").then((r) => r.json()).catch(() => null),
+        ]);
+        latest = dashboard;
+        liveUpdatedAt = dashboard.refreshedAt || dashboard.generatedAt || new Date().toISOString();
+        liveNextRefreshAt = null;
+        render(dashboard);
+        if (assignees) {
+          const rows = assignees.assignees || [];
+          $("assigneeCount").textContent = `${fmt(rows.length)} assignees`;
+          $("assigneeGrid").innerHTML = rows.map((a) => `
+            <article class="assignee-card">
+              <div class="assignee-avatar" style="background:${avatarColor(a.name)}">${esc(initials(a.name))}</div>
+              <div>
+                <span title="${esc(a.name)}">${esc(a.name)}</span>
+                <strong>${formatPair(a.working, a.completed)}</strong>
+              </div>
+            </article>
+          `).join("") || `<div class="message">No Cotton assignees found.</div>`;
+        }
+        if (suggestions) {
+          liveCache_suggestions = suggestions;
+          $("liveInfoBar").classList.remove("hidden");
+          $("assignmentPanel").classList.add("hidden");
+        }
+      } catch (err) {
+        showUnavailable("Static dashboard data could not be loaded. Please refresh.");
+      }
+    }
+
     if (previewMode) {
-      const demoRows = [
-        ["DN-80359", "PEPSICO", "8395249247", "7816917037", "ORG-1074"],
-        ["DN-81185", "PEPSICO", "8395401358", "7817042808", "ORG-505213"],
-        ["DN-81164", "PEPSICO", "8395187828", "7816923458", "ORG-378950"],
-        ["DN-81294", "GOLDEN BULL MARKETING", "5KG2IPYA", "113-9548912-1811446", "ORG-360126"],
-        ["DN-81291", "PEPSICO", "8395199624", "7817046329", "ORG-379267"],
-        ["DN-81292", "PEPSICO", "8395221142", "7817020382", "ORG-378250"],
-        ["DN-81247", "PEPSICO", "8395380371", "7817059648", "ORG-378950"],
-        ["DN-81289", "PEPSICO", "8395362565", "7816694816", "ORG-1074"],
-        ["DN-81230", "PEPSICO", "8395372563", "7816817999", "ORG-501842"],
-        ["DN-81253", "ONLINE RETAILER RETURN FACILITY", "8395380153", "Return", "ORG-378950"],
-      ].map((row, index) => ({
-        orderNumber: row[0],
-        customer: row[1],
-        status: "PLANNED",
-        baseQty: 0,
-        po: row[2],
-        so: row[3],
-        appointmentTime: new Date(Date.now() + index * 36e5).toISOString(),
-        retailerName: row[1] === "GOLDEN BULL MARKETING" ? "AMAZON.COM" : row[1],
-        carrier: row[4],
-      }));
-      const demo = {
-        siteLabel: "Cotton (LT_F34)",
-        refreshedAt: new Date().toISOString(),
-        metrics: [
-          { label: "In-Yard FULL Equipment", value: 0, sub: "Not yet devanned" },
-          { label: "Customers", value: 7, sub: "Cotton facility" },
-          { label: "Planned FTL/LTL Orders", value: 10, sub: "All customers" },
-          { label: "Older than 48 hours", value: 4, sub: "Pending non-Dropship" },
-          { label: "E-Comm Orders", value: 1, sub: "Planned Orders" },
-          { label: "E-Comm Past SLA", value: 0, sub: "Planned Orders" },
-        ],
-        customerRows: [{ customer: "PEPSICO", orderCount: 9 }, { customer: "GOLDEN BULL MARKETING", orderCount: 1 }],
-        inYardFullEquipment: { rows: [] },
-        watchList: { rows: [] },
-        detailRows: demoRows,
-        dropshipOlderThan24Rows: [],
-      };
-      latest = demo;
-      render(demo);
-      const names = ["BRIAN ALEJANDRO MENDOZA", "ULISES OROPEZA BERNAL", "HENRY ALONSO LOPEZ T...", "JESUS EMMANUEL JAIME", "GRACIELA ORTEGA", "SULEMA RODELAS", "VIOLA ZAMORA SLONE", "GUSTAVO LEON CARDOZO"];
-      const counts = ["00/2509", "00/2070", "00/1983", "01/1888", "00/1573", "00/1467", "00/1310", "00/1001"];
-      $("assigneeCount").textContent = "51 assignees";
-      $("assigneeGrid").innerHTML = names.map((name, index) => `
-        <article class="assignee-card">
-          <div class="assignee-avatar" style="background:${avatarColor(name)}">${esc(initials(name))}</div>
-          <div><span title="${esc(name)}">${esc(name)}</span><strong>${counts[index]}</strong></div>
-        </article>
-      `).join("") + `<article class="assignee-card"><div></div><div><span>...</span><strong style="color:#5f8cff;font-size:13px;">View all assignees</strong></div></article>`;
+      $("loginForm").classList.add("hidden");
+      $("dashboard").classList.remove("hidden");
+      $("subtitle").textContent = "Loading Cotton data...";
+      loadStaticData();
     } else {
       $("loginForm").classList.add("hidden");
       $("dashboard").classList.remove("hidden");
