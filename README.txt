@@ -1,6 +1,6 @@
 Cotton Dashboard
 
-This is a local dashboard. It is not deployed as a website.
+This is a Node.js dashboard that can run locally or as a permanent production website.
 
 How to run:
 1. Extract the zip file first.
@@ -42,3 +42,20 @@ Notes:
 - If port 4895 is already in use, set a different port before running:
   $env:PORT=4896
   node server.js
+
+Production deployment:
+1. Deploy this GitHub repo as a Node web service.
+2. Use:
+   Build command: npm install --omit=dev
+   Start command: npm start
+   Health check path: /health
+3. Set these environment variables in the production host:
+   WISE_USERNAME
+   WISE_PASSWORD
+4. Optional environment variables:
+   IAM_BASE_URL=https://id.item.com
+   WMS_API_BASE_URL=https://unis.item.com/api
+
+Render.com option:
+- This repo includes render.yaml for Render Blueprint deployment.
+- In Render, choose New > Blueprint, connect this repo, then enter WISE_USERNAME and WISE_PASSWORD as secret environment variables.

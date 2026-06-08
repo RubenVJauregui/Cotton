@@ -1,0 +1,15 @@
+services:
+  - type: web
+    name: cotton-dashboard
+    runtime: node
+    plan: starter
+    buildCommand: npm install --omit=dev
+    startCommand: npm start
+    healthCheckPath: /health
+    envVars:
+      - key: NODE_ENV
+        value: production
+      - key: WISE_USERNAME
+        sync: false
+      - key: WISE_PASSWORD
+        sync: false
