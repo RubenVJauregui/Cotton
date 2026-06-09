@@ -525,6 +525,34 @@
       border: 1px solid #115e59;
     }
     .confirm-assign-button:hover { background: #115e59; }
+    .row-assign-controls {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    .row-assignee-select {
+      width: 170px;
+      min-width: 150px;
+      border: 1px solid rgba(135, 163, 207, .56);
+      border-radius: 6px;
+      padding: 7px 8px;
+      background: rgba(255,255,255,.96);
+      color: #07173a;
+      font-size: 11px;
+      font-weight: 800;
+    }
+    .row-assign-button {
+      min-width: 74px;
+      padding: 8px 11px;
+      border: 1px solid #15803d;
+      border-radius: 6px;
+      background: #16a34a;
+      color: #fff;
+      font-size: 11px;
+      font-weight: 900;
+    }
+    .row-assign-button:hover { background: #15803d; }
+    .row-assign-button:disabled { opacity: .55; cursor: wait; }
     .live-info-bar {
       display: flex;
       flex-wrap: wrap;
@@ -615,7 +643,7 @@
         <div class="table-wrap" style="max-height:360px;">
           <table>
             <thead>
-              <tr><th>Work Type</th><th>Order / RN</th><th>Customer</th><th>Status</th><th>Order Type</th><th>Suggested Assignee</th><th>History Count</th><th>Rule</th></tr>
+              <tr><th>Work Type</th><th>Order / RN</th><th>Customer</th><th>Status</th><th>Order Type</th><th>Assignee</th><th>Assign</th><th>History Count</th><th>Rule</th></tr>
             </thead>
             <tbody id="assignmentRows"></tbody>
           </table>
@@ -723,6 +751,8 @@
     let liveNextRefreshAt = null;
     let liveCache_suggestions = null;
     let autoAssignedTasks = [];
+    let availableAssignees = [];
+    const selectedAssigneesByTask = new Map();
     const previewMode = new URLSearchParams(window.location.search).has("preview") || window.location.hostname.endsWith("github.io");
     const $ = (id) => document.getElementById(id);
     const fmt = (value) => Number(value || 0).toLocaleString("en-US");
@@ -904,12 +934,45 @@
       return `${String(Number(working || 0)).padStart(2, "0")}/${String(Number(completed || 0)).padStart(2, "0")}`;
     }
 
+    function taskId(row) {
+      return String(row?.orderNumber || row?.rn || "Pending");
+    }
+
+    function assigneeOptionsHtml(selectedName) {
+      const selectedKey = String(selectedName || "").toLowerCase();
+      return availableAssignees.map((a) => {
+        const selected = String(a.name || "").toLowerCase() === selectedKey ? " selected" : "";
+        return `<option value="${esc(a.userId || "")}" data-name="${esc(a.name || "")}"${selected}>${esc(a.name || "Unknown")}</option>`;
+      }).join("");
+    }
+
+    function renderRowAssignControls(row) {
+      const id = taskId(row);
+      const current = selectedAssigneesByTask.get(id) || {
+        name: row.suggestedAssignee || "",
+        userId: row.suggestedAssigneeUserId || row.assignmentTarget?.suggestedAssigneeUserId || "",
+      };
+      if (!current.userId && availableAssignees.length) {
+        const match = availableAssignees.find((a) => String(a.name || "").toLowerCase() === String(current.name || "").toLowerCase());
+        if (match) current.userId = match.userId || "";
+      }
+      const options = assigneeOptionsHtml(current.name);
+      return `
+        <div class="row-assign-controls">
+          <select class="row-assignee-select" data-task-id="${esc(id)}" aria-label="Choose assignee for ${esc(id)}">
+            ${options || `<option value="">No assignees available</option>`}
+          </select>
+        </div>
+      `;
+    }
+
     async function loadAssignees() {
       if (!session) return;
       try {
         $("assigneeCount").textContent = "Loading";
         const data = await post("/api/assignees", session);
         const assignees = (data.assignees || []).filter((a) => Number(a.working || 0) > 0);
+        availableAssignees = assignees;
         $("assigneeCount").textContent = `${fmt(assignees.length)} logged in`;
         $("assigneeGrid").innerHTML = assignees.map((a) => `
           <article class="assignee-card">
@@ -946,11 +1009,13 @@
           <td>${esc(r.customer)}</td>
           <td><span class="status">${esc(r.status)}</span></td>
           <td>${esc(r.orderType || "Pending")}</td>
-          <td class="strong">${esc(r.suggestedAssignee)}</td>
+          <td>${renderRowAssignControls(r)}</td>
+          <td><button class="row-assign-button" type="button" data-assign-task="${esc(taskId(r))}">Assign</button></td>
           <td class="number">${fmt(r.offloadedRnsForCustomer || r.packedOrdersForCustomer)}</td>
           <td>${esc(r.source)}</td>
         </tr>
-      `).join("") || `<tr><td colspan="8">No assignable tasks detected this cycle.</td></tr>`;
+      `).join("") || `<tr><td colspan="9">No assignable tasks detected this cycle.</td></tr>`;
+      attachRowAssignHandlers(rows);
     }
 
     function renderAssignmentSuggestions(data) {
@@ -970,11 +1035,13 @@
           <td>${esc(r.customer)}</td>
           <td><span class="status">${esc(r.status)}</span></td>
           <td>${esc(r.orderType || "Pending")}</td>
-          <td class="strong">${esc(r.suggestedAssignee)}</td>
+          <td>${renderRowAssignControls(r)}</td>
+          <td><button class="row-assign-button" type="button" data-assign-task="${esc(taskId(r))}">Assign</button></td>
           <td class="number">${fmt(r.offloadedRnsForCustomer || r.packedOrdersForCustomer)}</td>
           <td>${esc(r.source)}</td>
         </tr>
-      `).join("") || `<tr><td colspan="8">No planned orders or inbound RNs available for assignment suggestions.</td></tr>`;
+      `).join("") || `<tr><td colspan="9">No planned orders or inbound RNs available for assignment suggestions.</td></tr>`;
+      attachRowAssignHandlers(rows);
     }
 
     function renderAutoAssignedTasks(tasks) {
@@ -991,6 +1058,57 @@
       `).join("") || `<tr><td colspan="5">No tasks have been auto assigned yet.</td></tr>`;
     }
 
+    function attachRowAssignHandlers(rows) {
+      const byId = new Map((rows || []).map((row) => [taskId(row), row]));
+      document.querySelectorAll(".row-assignee-select").forEach((select) => {
+        select.addEventListener("change", () => {
+          const selected = select.options[select.selectedIndex];
+          selectedAssigneesByTask.set(select.dataset.taskId, {
+            userId: select.value,
+            name: selected?.dataset?.name || selected?.textContent || "",
+          });
+        });
+      });
+      document.querySelectorAll("[data-assign-task]").forEach((button) => {
+        button.addEventListener("click", async () => {
+          const id = button.dataset.assignTask;
+          const row = byId.get(id);
+          const select = [...document.querySelectorAll(".row-assignee-select")].find((item) => item.dataset.taskId === id);
+          const selected = select?.options?.[select.selectedIndex];
+          const assigneeUserId = select?.value || row?.suggestedAssigneeUserId || row?.assignmentTarget?.suggestedAssigneeUserId || "";
+          const assignee = selected?.dataset?.name || selected?.textContent || row?.suggestedAssignee || "";
+          if (!assigneeUserId) {
+            $("dashboardMessage").textContent = "Choose an available assignee before assigning this task.";
+            return;
+          }
+          button.disabled = true;
+          button.textContent = "Assigning";
+          $("dashboardMessage").textContent = "";
+          try {
+            const res = await fetch("/api/live-assign-task", {
+              method: "POST",
+              headers: { "content-type": "application/json" },
+              body: JSON.stringify({ taskId: id, assigneeUserId, assignee }),
+            });
+            const json = await res.json().catch(() => ({}));
+            if (!res.ok) {
+              $("dashboardMessage").textContent = json.message || "Task assignment failed.";
+              return;
+            }
+            $("dashboardMessage").textContent = json.message || `Assigned ${id}.`;
+            if (json.assigned?.length) {
+              renderAutoAssignedTasks([...autoAssignedTasks, ...json.assigned]);
+            }
+          } catch (err) {
+            $("dashboardMessage").textContent = err.message || "Could not assign this task.";
+          } finally {
+            button.disabled = false;
+            button.textContent = "Assign";
+          }
+        });
+      });
+    }
+
     async function loadAssignmentSuggestions(mode) {
       if (!session) {
         $("dashboardMessage").textContent = "Sign in and load Cotton first, then try the assignment buttons again.";
@@ -1004,7 +1122,7 @@
         $("assignmentActions").classList.add("hidden");
         $("confirmAssignButton").classList.add("hidden");
         $("confirmAutonomousButton").classList.add("hidden");
-        $("assignmentRows").innerHTML = `<tr><td colspan="8">Loading assignment suggestions...</td></tr>`;
+        $("assignmentRows").innerHTML = `<tr><td colspan="9">Loading assignment suggestions...</td></tr>`;
         $("assignmentPanel").scrollIntoView({ behavior: "smooth", block: "start" });
         setBusy(true, mode === "suggest" ? "Building assignment suggestions..." : mode === "autonomous" ? "Building autonomous assignment plan..." : "Building assignment plan...");
         const data = session
@@ -1227,6 +1345,7 @@
         if (assignees) {
           // GitHub Pages is static, so use the saved WISE working-task snapshot as the logged-in signal.
           const rows = (assignees.assignees || []).filter((a) => Number(a.working || 0) > 0);
+          availableAssignees = rows;
           $("assigneeCount").textContent = `${fmt(rows.length)} logged in`;
           $("assigneeGrid").innerHTML = rows.map((a) => `
             <article class="assignee-card">
@@ -1291,6 +1410,7 @@
         render(json.dashboard);
         if (json.assignees) {
           const assignees = (json.assignees.assignees || []).filter((a) => Number(a.working || 0) > 0);
+          availableAssignees = assignees;
           $("assigneeCount").textContent = `${fmt(assignees.length)} logged in`;
           $("assigneeGrid").innerHTML = assignees.map((a) => `
             <article class="assignee-card">

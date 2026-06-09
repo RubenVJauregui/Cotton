@@ -816,7 +816,9 @@ async function fetchCottonAssignees(session = lastSession) {
   for (const task of Array.isArray(tasks) ? tasks : []) {
     const name = String(pickAssigneeName(task) || "").trim();
     if (!name) continue;
-    const current = names.get(name) || { name, taskCount: 0, working: 0, completed: 0 };
+    const userId = pickAssigneeUserId(task);
+    const current = names.get(name) || { name, userId: userId || "", taskCount: 0, working: 0, completed: 0 };
+    if (!current.userId && userId) current.userId = userId;
     const orders = taskOrderCount(task);
     const bucket = taskStatusBucket(task);
     current.taskCount += 1;
@@ -838,6 +840,60 @@ async function fetchCottonAssignees(session = lastSession) {
     fs.writeFileSync(path.join(__dirname, "last-assignees.json"), JSON.stringify(result, null, 2));
   } catch {}
   return result;
+}
+
+function cloneMutationWithAssignee(mutation, assigneeUserId) {
+  const body = { ...(mutation?.body || {}) };
+  if ("defaultAssigneeUserId" in body) body.defaultAssigneeUserId = assigneeUserId;
+  body.assigneeUserId = assigneeUserId;
+  return { ...mutation, body };
+}
+
+async function executeSingleLiveAssign({ taskId, assigneeUserId, assignee }) {
+  if (!SERVICE_USERNAME || !SERVICE_PASSWORD) {
+    throw new Error("Service credentials not configured. Cannot perform assignments.");
+  }
+  if (!taskId || !assigneeUserId) {
+    throw new Error("Choose an assignee before assigning this task.");
+  }
+
+  const suggestions = liveCache.assignmentSuggestions?.suggestions || [];
+  const sug = suggestions.find((item) => String(item.orderNumber || item.rn || "") === String(taskId));
+  if (!sug) {
+    throw new Error("Task is no longer available in the current Auto Suggest list.");
+  }
+
+  const target = sug.assignmentTarget;
+  if (!target?.mutationReady || !target.mutation) {
+    throw new Error("Task is missing the WISE assignment target.");
+  }
+
+  const session = await login(SERVICE_USERNAME, SERVICE_PASSWORD);
+  const headers = wmsHeaders(session, session.cottonFacility);
+  const executedBy = session.identity?.user_name || SERVICE_USERNAME;
+  const executedAt = new Date().toISOString();
+  const mutation = cloneMutationWithAssignee(target.mutation, assigneeUserId);
+
+  await apiFetch(`${WMS_API_BASE_URL}${mutation.endpoint}`, {
+    method: mutation.method,
+    headers,
+    body: JSON.stringify(mutation.body),
+  });
+
+  return {
+    assigned: [{
+      id: taskId,
+      assignee: assignee || sug.suggestedAssignee,
+      assigneeUserId,
+      type: target.targetType,
+      endpoint: mutation.endpoint,
+      executedBy,
+      executedAt,
+    }],
+    skipped: [],
+    errors: [],
+    message: `Assigned ${taskId} to ${assignee || "selected assignee"}.`,
+  };
 }
 
 function rankedAssignees(map) {
@@ -1336,6 +1392,10 @@ async function handler(req, res) {
     }
     if (req.method === "POST" && pathname === "/api/live-auto-assign") {
       return send(res, 200, await executeLiveAutoAssign());
+    }
+    if (req.method === "POST" && pathname === "/api/live-assign-task") {
+      const body = await readJson(req);
+      return send(res, 200, await executeSingleLiveAssign(body));
     }
     return send(res, 404, { message: "Not found." });
   } catch (error) {
