@@ -376,6 +376,15 @@
     }
     .table-wrap { overflow: auto; max-height: 620px; }
     .orders-table-wrap { max-height: 366px; overflow-y: auto; overflow-x: auto; }
+    .auto-assigned-section {
+      grid-column: 1;
+      min-height: 240px;
+    }
+    .auto-assigned-wrap {
+      max-height: 184px;
+      overflow-y: auto;
+      overflow-x: auto;
+    }
     table {
       width: 100%;
       border-collapse: collapse;
@@ -658,6 +667,22 @@
             </table>
           </div>
         </section>
+        <section id="autoAssignedPanel" class="auto-assigned-section">
+          <div class="section-head">
+            <h2>Tasks Auto Assigned</h2>
+            <span id="autoAssignedCount">0 tasks</span>
+          </div>
+          <div class="table-wrap auto-assigned-wrap">
+            <table>
+              <thead>
+                <tr><th>Task</th><th>Assigned To</th><th>Type</th><th>Auto Assigned By</th><th>Assigned At</th></tr>
+              </thead>
+              <tbody id="autoAssignedRows">
+                <tr><td colspan="5">No tasks have been auto assigned yet.</td></tr>
+              </tbody>
+            </table>
+          </div>
+        </section>
         <section>
           <div class="section-head">
             <h2>Cotton Assignees</h2>
@@ -697,6 +722,7 @@
     let liveUpdatedAt = null;
     let liveNextRefreshAt = null;
     let liveCache_suggestions = null;
+    let autoAssignedTasks = [];
     const previewMode = new URLSearchParams(window.location.search).has("preview") || window.location.hostname.endsWith("github.io");
     const $ = (id) => document.getElementById(id);
     const fmt = (value) => Number(value || 0).toLocaleString("en-US");
@@ -951,6 +977,20 @@
       `).join("") || `<tr><td colspan="8">No planned orders or inbound RNs available for assignment suggestions.</td></tr>`;
     }
 
+    function renderAutoAssignedTasks(tasks) {
+      autoAssignedTasks = Array.isArray(tasks) ? tasks : [];
+      $("autoAssignedCount").textContent = `${fmt(autoAssignedTasks.length)} tasks`;
+      $("autoAssignedRows").innerHTML = autoAssignedTasks.map((task) => `
+        <tr>
+          <td class="strong">${esc(task.id || task.orderNumber || task.rn || "Pending")}</td>
+          <td>${esc(task.assignee || "Pending")}</td>
+          <td>${esc(task.type || task.workType || "Task")}</td>
+          <td>${esc(task.executedBy || "Unknown user")}</td>
+          <td>${esc(date(task.executedAt || new Date().toISOString()))}</td>
+        </tr>
+      `).join("") || `<tr><td colspan="5">No tasks have been auto assigned yet.</td></tr>`;
+    }
+
     async function loadAssignmentSuggestions(mode) {
       if (!session) {
         $("dashboardMessage").textContent = "Sign in and load Cotton first, then try the assignment buttons again.";
@@ -1120,6 +1160,7 @@
           if (json.assigned?.length) {
             const detail = json.assigned.map((a) => `${a.id} → ${a.assignee} (${a.type})`).join("; ");
             $("assignmentNote").textContent = `Assigned: ${detail}`;
+            renderAutoAssignedTasks(json.assigned);
           }
         }
       } catch (err) {
@@ -1148,6 +1189,7 @@
           if (json.assigned?.length) {
             const detail = json.assigned.map((a) => `${a.id} → ${a.assignee} (${a.type})`).join("; ");
             $("assignmentNote").textContent = `Assigned: ${detail}`;
+            renderAutoAssignedTasks(json.assigned);
           }
         }
       } catch (err) {

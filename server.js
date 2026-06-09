@@ -1141,6 +1141,8 @@ async function executeLiveAutoAssign() {
 
   const session = await login(SERVICE_USERNAME, SERVICE_PASSWORD);
   const headers = wmsHeaders(session, session.cottonFacility);
+  const executedBy = session.identity?.user_name || SERVICE_USERNAME;
+  const executedAt = new Date().toISOString();
   const assigned = [];
   const skipped = [];
   const errors = [];
@@ -1179,6 +1181,8 @@ async function executeLiveAutoAssign() {
         assigneeUserId: target.suggestedAssigneeUserId,
         type: target.targetType,
         endpoint: target.mutation.endpoint,
+        executedBy,
+        executedAt,
       });
     } catch (err) {
       errors.push({ id, assignee: sug.suggestedAssignee, type: target.targetType, error: err.message || "Mutation failed." });
