@@ -980,8 +980,13 @@ async function fetchAssignmentSuggestions(session = lastSession) {
     throw new Error("Sign in and load Cotton first.");
   }
   const dashboard = await fetchDashboard(session);
-  const plannedRows = dashboard.detailRows || [];
-  const inboundRows = (dashboard.inYardFullEquipment?.rows || []).map(mapInboundRn).filter((row) => row.rn);
+  // Exclude PEPSI/PEPSICO from Auto Suggest, Auto Assign, and Autonomous assignment flows.
+  // Pepsi orders remain visible in the dashboard metrics/tables; they are only excluded from assignment suggestions and write-back.
+  const isPepsiCustomer = (value) => normalizeName(value).includes("PEPSI");
+  const plannedRows = (dashboard.detailRows || []).filter((row) => !isPepsiCustomer(row.customer));
+  const inboundRows = (dashboard.inYardFullEquipment?.rows || [])
+    .map(mapInboundRn)
+    .filter((row) => row.rn && !isPepsiCustomer(row.customer));
   const headers = wmsHeaders(session, session.cottonFacility);
   const now = new Date();
   const lookbackStart = new Date(now);
