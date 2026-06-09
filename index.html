@@ -909,8 +909,8 @@
       try {
         $("assigneeCount").textContent = "Loading";
         const data = await post("/api/assignees", session);
-        const assignees = data.assignees || [];
-        $("assigneeCount").textContent = `${fmt(assignees.length)} assignees`;
+        const assignees = (data.assignees || []).filter((a) => Number(a.working || 0) > 0);
+        $("assigneeCount").textContent = `${fmt(assignees.length)} logged in`;
         $("assigneeGrid").innerHTML = assignees.map((a) => `
           <article class="assignee-card">
             <div class="assignee-avatar" style="background:${avatarColor(a.name)}">${esc(initials(a.name))}</div>
@@ -919,7 +919,7 @@
               <strong>${formatPair(a.working, a.completed)}</strong>
             </div>
           </article>
-        `).join("") || `<div class="message">No Cotton assignees found.</div>`;
+        `).join("") || `<div class="message">No logged-in Cotton users found.</div>`;
       } catch (error) {
         $("assigneeCount").textContent = "Unavailable";
         $("assigneeGrid").innerHTML = `<div class="message">${esc(error.message || "Could not load assignees.")}</div>`;
@@ -1225,10 +1225,9 @@
         liveNextRefreshAt = null;
         render(dashboard);
         if (assignees) {
-          // GitHub Pages is static, so it cannot query current WISE login sessions.
-          // Show only active Cotton users from the saved WISE snapshot: users with working tasks.
+          // GitHub Pages is static, so use the saved WISE working-task snapshot as the logged-in signal.
           const rows = (assignees.assignees || []).filter((a) => Number(a.working || 0) > 0);
-          $("assigneeCount").textContent = `${fmt(rows.length)} active users`;
+          $("assigneeCount").textContent = `${fmt(rows.length)} logged in`;
           $("assigneeGrid").innerHTML = rows.map((a) => `
             <article class="assignee-card">
               <div class="assignee-avatar" style="background:${avatarColor(a.name)}">${esc(initials(a.name))}</div>
@@ -1237,7 +1236,7 @@
                 <strong>${formatPair(a.working, a.completed)}</strong>
               </div>
             </article>
-          `).join("") || `<div class="message">No active Cotton users found in the saved WISE snapshot.</div>`;
+          `).join("") || `<div class="message">No logged-in Cotton users found in the saved WISE snapshot.</div>`;
         }
         if (suggestions) {
           liveCache_suggestions = suggestions;
@@ -1291,8 +1290,8 @@
         latest = json.dashboard;
         render(json.dashboard);
         if (json.assignees) {
-          const assignees = json.assignees.assignees || [];
-          $("assigneeCount").textContent = `${fmt(assignees.length)} assignees`;
+          const assignees = (json.assignees.assignees || []).filter((a) => Number(a.working || 0) > 0);
+          $("assigneeCount").textContent = `${fmt(assignees.length)} logged in`;
           $("assigneeGrid").innerHTML = assignees.map((a) => `
             <article class="assignee-card">
               <div class="assignee-avatar" style="background:${avatarColor(a.name)}">${esc(initials(a.name))}</div>
@@ -1301,7 +1300,7 @@
                 <strong>${formatPair(a.working, a.completed)}</strong>
               </div>
             </article>
-          `).join("") || `<div class="message">No Cotton assignees found.</div>`;
+          `).join("") || `<div class="message">No logged-in Cotton users found.</div>`;
         }
         if (json.suggestions) {
           liveCache_suggestions = json.suggestions;

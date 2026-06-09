@@ -825,11 +825,13 @@ async function fetchCottonAssignees(session = lastSession) {
     names.set(name, current);
   }
   const assignees = [...names.values()]
+    .filter((assignee) => Number(assignee.working || 0) > 0)
     .sort((a, b) => (b.working + b.completed) - (a.working + a.completed) || a.name.localeCompare(b.name));
   const result = {
     facility: session.cottonFacility,
     lookbackDays: 60,
     taskRows: tasks.length,
+    loginSignal: "workingTasks",
     assignees,
   };
   try {
